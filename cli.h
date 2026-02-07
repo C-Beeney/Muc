@@ -1,34 +1,65 @@
 #include <stddef.h>
 
-static const size_t MAX_ARGUMENT_LENGTH = (1024 - sizeof(void *) *2); /* CliArgument will be 1k */
+#ifndef CLI_COLLECTION_REGISTER_COUNT
+#define CLI_COLLECTION_REGISTER_COUNT 16
+#endif/*CLI_COLLECTION_REGISTER_COUNT*/
 
-struct CliArgument {
+#ifndef CLI_COLLECTION_CHILD_COUNT
+#define CLI_COLLECTION_CHILD_COUNT 16
+#endif
 
-    struct CliArgument *children;       /* Variable number of children */
+#ifndef CLI_TOGGLE_REGISTER_COUNT
+#define CLI_TOGGLE_REGISTER_COUNT 16
+#endif/*CLI_TOGGLE_REGISTER_COUNT*/
 
-    char argument[MAX_ARGUMENT_LENGTH]; /* Used to store cli args e.g. filepaths or --new-muc etc */
+#ifndef CLI_ACTIONS_REGISTER_COUNT
+#define CLI_ACTIONS_REGISTER_COUNT 16
+#endif/*CLI_ACTIONS_REGISTER_COUNT*/
 
+#ifndef CLI_REGISTRY_NAME_MAX_LENGTH
+#define CLI_REGISTRY_NAME_MAX_LENGTH 16
+#endif
+
+struct CliContext;
+
+struct CliContextCollection {
+    char name[CLI_REGISTRY_NAME_MAX_LENGTH];
+    char values[CLI_COLLECTION_CHILD_COUNT][CLI_REGISTRY_NAME_MAX_LENGTH];
 };
 
-/* Argument utility functions */
-void cli_argument_init_children(
-    const size_t child_count,
-    struct CliArgument *cli_argument
-);
+struct CliContextToggle {
+    char name[CLI_REGISTRY_NAME_MAX_LENGTH];
+    char is_true;
+};
 
-/* Argument parsing */
 
-void cli_argument_parse_argv(
-    int argc,
-    char ** argv,
-    struct CliArgument *cli_argument
-);
+struct CliContextAction {
+    char name[CLI_REGISTRY_NAME_MAX_LENGTH];
+    void (*action) (struct CliContext *context);
+};
 
-/* Argument handling */
+struct CliContextRegistry {
+    struct CliContextCollection collections[CLI_COLLECTION_REGISTER_COUNT];
+    struct CliContextToggle toggles[CLI_TOGGLE_REGISTER_COUNT];
+    struct CliContextAction actions[CLI_ACTIONS_REGISTER_COUNT];
+};
 
-void cli_register_argument_handler(
-    const char *const argument,
-    void (*handler) (const struct CliArgument *const)
-);
+struct CliContext {
+    struct CliContextRegistry registry;
+};
 
-void cli_handle_arguments(void);
+
+void cli_register_collection( struct CliContext *cli_context,
+                              char *name,
+                              char **default_values
+                            );
+
+void cli_register_toggle( struct CliContext *cli_context,
+                          char *name,
+                          char default_is_true
+                        );
+
+void cli_reigster_action( struct CliContext *cli_context,
+                          char *name,
+                          void(*action)(void)
+                        );
