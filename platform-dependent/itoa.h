@@ -1,1 +1,0 @@
-char *itoa(int i, char *s);

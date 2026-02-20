@@ -1,84 +1,31 @@
-#include "muc.h"
+#include <muc.h>
+#include <util/sys.h>
+#include <util/assert.h>
+#include <cli.h>
 
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+i32 main(i32 argc, u8 ** argv, u8 ** env)
+{	
 
-#include "platform-dependent/itoa.h"
-#include "cli.h"
+	char *names[2] = {"abcdef", "ghijkl"};
 
-static void print(char *x)
-{
-	size_t x_length;
-	
-	assert(x != NULL);
-
-	x_length = strlen(x);
-
-
-	if (x_length != (size_t)write(1, x, x_length)) {
-		assert(0 && "Failed to print full message to stdout");
-	}
-}
-
-static void print_argc(int const argc) {
-
-	char argcbuf[4] = {0};
-
-	char *argcstr = itoa(argc, argcbuf);
-
-	print("Value of argc is : ");
-	print(argcstr);
-	print(".\n");
-
-}
-
-int main(int argc, char ** argv, __attribute_maybe_unused__ char ** env)
-{
-
-	int i;
-	struct CliContext ctx = {0};
-	char *cli_collection_with_defaults[] = {"Hello", "World"};
-
-	memset(&ctx, 0, sizeof(ctx));
-	
-	print_argc(argc);
-	
-	print("Printing all values of argv below:\n\n");
-	
-	for (i = 0; i < argc; ++i) {
-		
-		char ibuf[4] = {0};
-		char *istr = itoa(i, ibuf);
-		
-		print("Value of argv[");
-		print(istr);
-		print("] is ");
-		print(argv[i]);
-		print("\n");
-		
-	}
-	
-	cli_register_collection(&ctx, "--as", NULL);
-	cli_register_collection(&ctx, "--with", cli_collection_with_defaults);
-
-	print("Printing args.\n");
-	for (i = 0; i < 2; ++i) {
-		int j = -1;
-
-		print(ctx.registry.collections[i].name);
-		print("\n");
-
-		while(*ctx.registry.collections[i].values[++j]) {
-			print("value -> ");
-			print(ctx.registry.collections[i].values[j]);
-			print("\n");
-		}
-	}
-	print("Printed args.\n");
+	write((u32) STDOUT, (u8*) names[0], (imax) 1);
+	write((u32) STDOUT, (u8*) names[1], (imax) 1);
 
 	return 0;
-
 }
+
+/*
+ * API for cli, register actions, collections & toggles.
+ * first item will be the action
+ * items beyond will be collections or toggles
+ * 	memory will not be assigned. All memory needed SHOULD be prealocated by the kernel and stored under argv.
+ * 
+ * 						          {reg info}                      {name to match}      {ptr array for argv}
+ * 	cli_register_collection((struct CliContext*) cli_context, (u8*) collection_name, (u8**) collection_size)
+ * 
+ * 	collection called -c which can hold 16 64-bit pointers to string values.
+ * 	cli_register_collection(ctx, "-c", malloc(128));
+ * 
+ * 
+ * 
+*/

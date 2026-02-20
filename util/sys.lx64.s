@@ -4,6 +4,7 @@
 .globl write
 .globl open
 .globl close
+.globl exit
 
 .section .text
 
@@ -27,3 +28,7 @@ close:
     movq $3, %rax
     syscall
     ret
+
+exit:
+    movq $60, %rax
+    syscall

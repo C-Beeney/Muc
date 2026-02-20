@@ -12,8 +12,4 @@ _start:
 
     andq $-16, %rsp                    ;# sp is 16-byte aligned
 
-    call main
-
-    mov %rax, %rdi                     ;# set prog exit code to main retval
-    movq $0x3c, %rax                   ;# exit syscall
-    syscall
+    call entry

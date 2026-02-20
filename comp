@@ -1,1 +1,1 @@
-clang cli.c muc.c platform-dependent/linux-x64/itoa.s -Wall -Wextra -pedantic -std=c89 -fsanitize=address -fsanitize=undefined -fno-omit-frame-pointer -g -O1
+clang muc.c util/entry.c util/string.c util/assert_fail.lx64.s util/init.lx64.s util/sys.lx64.s -ffreestanding -I. -Iheader -nostdlib -nostartfiles -nostdinc -static -flto -Wl,--gc-sections -Oz -s -o bin/muc
