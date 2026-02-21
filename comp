@@ -1,1 +1,0 @@
-clang muc.c util/entry.c util/string.c util/assert_fail.lx64.s util/init.lx64.s util/sys.lx64.s -ffreestanding -I. -Iheader -nostdlib -nostartfiles -nostdinc -static -flto -Wl,--gc-sections -Oz -s -o bin/muc

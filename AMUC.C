@@ -1,7 +1,7 @@
-#include <muc.h>
-#include <util/sys.h>
-#include <util/assert.h>
-#include <cli.h>
+#include <AMUC.H>
+#include <SSYS.H>
+#include <UASSERT.H>
+#include <ACLI.H>
 
 i32 main(i32 argc, u8 ** argv, u8 ** env)
 {	

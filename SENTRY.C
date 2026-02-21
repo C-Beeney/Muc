@@ -1,7 +1,7 @@
-#include <util/types.h>
-#include <util/sys.h>
+#include <STYPES.H>
+#include <SSYS.H>
 
-#include <muc.h>
+#include <AMUC.H>
 
 void entry(u32 argc, u8 ** argv, u8 ** env) {
 

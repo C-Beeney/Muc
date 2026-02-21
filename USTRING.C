@@ -1,6 +1,5 @@
-#include <util/string.h>
-#include <util/assert.h>
-
+#include <USTRING.H>
+#include <UASSERT.H>
 umax strlen(const u8 *buffer) {
     assert(buffer && "Buffer may not be null.");
     umax len = (umax) -1;

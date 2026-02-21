@@ -1,10 +1,10 @@
-#include <util/types.h>
-#include <util/assert.h>
-#include <util/string.h>
+#include <STYPES.H>
+#include <UASSERT.H>
+#include <USTRING.H>
 
 #ifndef CLI_CONFIG_H
 #define CLI_CONFIG_H
-#include <cli.conf.h>
+#include <CCLI.H>
 #endif
 
 struct CliCollection;
@@ -67,7 +67,7 @@ struct CliContext {
 };
 
 enum CliGenericType RESOURCE_TYPE_IDENTS;
-union CliGenericValue RESOURCE_VALUES value;
+union CliGenericValue RESOURCE_VALUES;
 
 struct CliGeneric {
     enum CliGenericType type;
