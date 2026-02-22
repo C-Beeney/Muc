@@ -16,4 +16,19 @@
 #                                                                            |
 #---------------------------------------------------------------------------*/
 
-docker run --rm -it --platform linux/amd64 -v "$(pwd):/app" -w /app ubuntu:24.04 bash -c "apt update && apt upgrade -y && apt install -y clang && bash"
+clang \
+    -x c *.C \
+    -x assembler SLX64.S \
+    -o OUT.ELF \
+    -flto -static -Wl,--gc-sections \
+    -Os -s \
+    -nostdlib -nostdinc -nostartfiles \
+    -I.\
+    -Weverything -Wno-reserved-identifier -Wno-empty-translation-unit \
+    -Wno-unsafe-buffer-usage \
+    -ffreestanding -ffunction-sections -fdata-sections \
+    -fvisibility=hidden \
+    -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions \
+    -fno-stack-protector \
+    -Werror \
+    -std=c89

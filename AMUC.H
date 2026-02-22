@@ -1,10 +1,28 @@
-#ifndef MUC_H
-#define MUC_H
+/*---------------------------------------------------------------------------|
+|                                                                            |
+|   Copyright 2026 Connor R Beeney                                           |
+|                                                                            |
+|   Licensed under the Apache License, Version 2.0 (the "License");          |
+|   you may not use this file except in compliance with the License.         |
+|   You may obtain a copy of the License at                                  |
+|                                                                            |
+|       http://www.apache.org/licenses/LICENSE-2.0                           |
+|                                                                            |
+|   Unless required by applicable law or agreed to in writing, software      |
+|   distributed under the License is distributed on an "AS IS" BASIS,        |
+|   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |
+|   See the License for the specific language governing permissions and      |
+|   limitations under the License.                                           |
+|                                                                            |
+|---------------------------------------------------------------------------*/
+
+#ifndef AMUC_H
+#define AMUC_H
 
 #include <STYPES.H>
 
 
-i32 main(i32 argc, u8 ** argv, u8 ** env);
+i8 main(i32 argc, u8 ** argv, u8 ** env);
 
 
-#endif /* MUC_H */
+#endif/*AMUC_H*/

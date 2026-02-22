@@ -1,11 +1,32 @@
-#include<STYPES.H>
+/*---------------------------------------------------------------------------|
+|                                                                            |
+|   Copyright 2026 Connor R Beeney                                           |
+|                                                                            |
+|   Licensed under the Apache License, Version 2.0 (the "License");          |
+|   you may not use this file except in compliance with the License.         |
+|   You may obtain a copy of the License at                                  |
+|                                                                            |
+|       http://www.apache.org/licenses/LICENSE-2.0                           |
+|                                                                            |
+|   Unless required by applicable law or agreed to in writing, software      |
+|   distributed under the License is distributed on an "AS IS" BASIS,        |
+|   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. |
+|   See the License for the specific language governing permissions and      |
+|   limitations under the License.                                           |
+|                                                                            |
+|---------------------------------------------------------------------------*/
 
-#define STDIN 0
-#define STDOUT 1
-#define STDERR 2
+#ifndef SSYS_H
+#define SSYS_H
+    #include<STYPES.H>
 
-u32  read  (u32 fh  , u8* buffer, imax count);
-u32  write (u32 fh  , u8 *buffer, imax count);
-u32  open  (u8 *path, u32 mode);
-void close (u32 fh);
-void exit  (i8 ec);
+    #define STDIN       ((const u32)0)
+    #define STDOUT      ((const u32)1)
+    #define STDERR      ((const u32)2)
+
+    u32  read  (const u32 fh  , u8* buffer, const imax count);
+    u32  write (const u32 fh  , const u8 *buffer, const imax count);
+    u32  open  (const u8 *path, const u32 mode);
+    void close (const u32 fh);
+    void exit  (const i8 ec);
+#endif/*SSYS_H*/
