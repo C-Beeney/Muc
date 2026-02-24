@@ -16,28 +16,12 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <USTRING.H>
+#include <MTEST.H>
 #include <UASSERT.H>
-umax strlen(const u8 *buffer) {
-        umax len = (umax) -1;
-        assert(buffer && "Buffer may not be null.");
-        while(buffer[++len]);
-        return len;
-}
-
-umax streq(
-        const u8 buffer0[],
-        const u8 buffer1[]
-) {
-        umax idx = 0;
-
-        while(
-                buffer0[++idx] && buffer1[idx] &&
-                buffer0[  idx] == buffer1[idx]
-        );
-        
-        return (
-                buffer0[idx] ==
-                buffer1[idx]
-        );
+#include <SSYS.H>
+void muc_test(const struct CliCallbackContext *context, u8 *rc)
+{
+        CLI_ACTION_CONTEXT_UNUSED;
+        assert(5==write(STDOUT, (u8*)"abcd\n", 5)&&"Please work :)");
+        CLI_ACTION_SET_EXIT_CODE(0);
 }

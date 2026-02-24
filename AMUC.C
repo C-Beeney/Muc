@@ -21,45 +21,40 @@
 #include <UASSERT.H>
 #include <USTRING.H>
 #include <ACLI.H>
+#include <MTEST.H>
 
-#define print(s) assert(strlen((const u8*)(s))==write(STDOUT,(const u8*)(s),(const imax)strlen((const u8*)(s))))
+#if 0
+#define print(s) assert(strlen((const u8*)(s))==write(STDOUT,(const u8*)(s),\
+                (const imax)strlen((const u8*)(s))))
+#endif
 
-i8 main(i32 argc, u8 ** argv, u8 ** env)
-{	
+void prime_context(struct CliContext cli_context[1]);
+void prime_context(struct CliContext cli_context[1])
+{ 
+        const u8 *collection_with[2] = {(u8*)"abc", (u8*)0};
+        const u8 *collection_as[2] = {(u8*)"def", (u8*)0};
+        union CliGenericValue cli_generic_value = {(u8*)"Hello, World!"};
 
-	struct CliContext cli_context[1];
-        const u8 *values[3] = {(u8*)"Test string", (u8*)"another", (u8*)0};
-        int offs = 3;
-
-        cli_register_collection(
-                (struct CliContext*)    cli_context,
-                (u8*)                   "--with",
-                (const u8 **)values
-        );
-
-        while (0 <-- offs) {
-                print(
-                        cli_context->registry->collection[0].value[2-offs]
-                );
-                print("\n");
-        }
-
-        (void) argc, (void) argv, (void) env;
-	return 0;
+        cli_register_collection (cli_context, (u8*)"--with" , collection_with);
+        cli_register_collection (cli_context, (u8*)"--as"   , collection_as);
+        cli_register_toggle     (cli_context, (u8*)"--quiet", 0);
+        cli_register_action     (cli_context, (u8*)"--test" , muc_test);
+        cli_register_resource   (cli_context, (u8*)"program:version", resource_string, cli_generic_value);
 }
 
-/*
- * API for cli, register actions, collections & toggles.
- * first item will be the action
- * items beyond will be collections or toggles
- * 	memory will not be assigned. All memory needed SHOULD be prealocated by the kernel and stored under argv.
- * 
- * 						          {reg info}                      {name to match}      {ptr array for argv}
- * 	cli_register_collection((struct CliContext*) cli_context, (u8*) collection_name, (u8**) collection_size)
- * 
- * 	collection called -c which can hold 16 64-bit pointers to string values.
- * 	cli_register_collection(ctx, "-c", malloc(128));
- * 
- * 
- * 
-*/
+i8 main(i32 argc, u8 *argv[], u8 *env[])
+{
+        struct CliContext cli_context[1];
+
+        cli_init_context(cli_context);
+
+        prime_context(cli_context);
+
+        cli_register_verify(cli_context);
+
+        cli_parse_args(cli_context, argc, argv);
+
+        (void) env;
+
+        return 0;
+}

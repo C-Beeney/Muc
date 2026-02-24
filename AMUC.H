@@ -22,7 +22,7 @@
 #include <STYPES.H>
 
 
-i8 main(i32 argc, u8 ** argv, u8 ** env);
+i8 main(i32 argc, u8 *argv[], u8 *env[]);
 
 
 #endif/*AMUC_H*/

@@ -31,4 +31,5 @@ clang \
     -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions \
     -fno-stack-protector \
     -Werror \
-    -std=c89
+    -ansi \
+    $@

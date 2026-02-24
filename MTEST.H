@@ -16,28 +16,6 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <USTRING.H>
-#include <UASSERT.H>
-umax strlen(const u8 *buffer) {
-        umax len = (umax) -1;
-        assert(buffer && "Buffer may not be null.");
-        while(buffer[++len]);
-        return len;
-}
+#include <ACLI.H>
 
-umax streq(
-        const u8 buffer0[],
-        const u8 buffer1[]
-) {
-        umax idx = 0;
-
-        while(
-                buffer0[++idx] && buffer1[idx] &&
-                buffer0[  idx] == buffer1[idx]
-        );
-        
-        return (
-                buffer0[idx] ==
-                buffer1[idx]
-        );
-}
+void muc_test(const struct CliCallbackContext *context, u8 *rc);
