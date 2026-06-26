@@ -18,7 +18,7 @@
 
 #ifndef SSYS_H
 #define SSYS_H
-    #include<STYPES.H>
+    #include <stypes.h>
 
     #define STDIN       ((const u32)0)
     #define STDOUT      ((const u32)1)

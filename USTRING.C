@@ -16,8 +16,8 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <USTRING.H>
-#include <UASSERT.H>
+#include <ustring.h>
+#include <uassert.h>
 umax strlen(const u8 *buffer) {
         umax len = (umax) -1;
         assert(buffer && "Buffer may not be null.");
@@ -25,17 +25,20 @@ umax strlen(const u8 *buffer) {
         return len;
 }
 
-umax streq(
+u8 streq(
         const u8 buffer0[],
         const u8 buffer1[]
 ) {
-        umax idx = 0;
+        umax idx = UMAX_MAX;
+
+        assert(buffer0 && "Buffer0 may not be null.");
+        assert(buffer1 && "Buffer1 may not be null.");
 
         while(
                 buffer0[++idx] && buffer1[idx] &&
                 buffer0[  idx] == buffer1[idx]
         );
-        
+
         return (
                 buffer0[idx] ==
                 buffer1[idx]

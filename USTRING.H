@@ -18,7 +18,8 @@
 
 #ifndef USTRING_H
 #define USTRING_H
-#include <STYPES.H>
+#include <stypes.h>
 
 umax strlen(const u8 *buffer);
+u8 streq(const u8 *buffer0, const u8 *buffer1);
 #endif/*USTRING_H*/

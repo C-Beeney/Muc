@@ -16,9 +16,9 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <MTEST.H>
-#include <UASSERT.H>
-#include <SSYS.H>
+#include <mtest.h>
+#include <uassert.h>
+#include <ssys.h>
 void muc_test(const struct CliCallbackContext *context, u8 *rc)
 {
         CLI_ACTION_CONTEXT_UNUSED;

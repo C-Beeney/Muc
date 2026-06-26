@@ -19,13 +19,13 @@
 #ifndef ACLI_H
         #define ACLI_H
 
-        #include <STYPES.H>
-        #include <UASSERT.H>
-        #include <USTRING.H>
+        #include <stypes.h>
+        #include <uassert.h>
+        #include <ustring.h>
 
         #ifndef CLI_CONFIG_H
                 #define CLI_CONFIG_H
-                #include <CCLI.H>
+                #include <ccli.h>
         #endif/*CLI_CONFIG_H*/
 
 /*--------------------------------------------------------------------------*/
@@ -115,7 +115,6 @@
                 u8                              rc[1]
         );
 
-
         struct CliAction {
                 const u8   *name;
                 CliCallback callback;
@@ -155,7 +154,7 @@
         );
 
         void cli_register_verify(
-                struct CliContext context[1]
+                const struct CliContext context[1]
         );
 
         void cli_register_toggle(
@@ -179,13 +178,13 @@
         void cli_register_resource(
                 struct CliContext     context[1],
                 const u8              name[],
-                enum CliGenericType   type,
-                union CliGenericValue value
+                const enum CliGenericType   type,
+                const union CliGenericValue value
         );
 
         void cli_parse_args(
                 struct CliContext context[1],
-                i32 argc,
+                const i32 argc,
                 u8 *argv[]
         );
 
@@ -193,44 +192,44 @@
                 typedef char __cli_generic_expected_size
                         [16  == sizeof(
                                 struct CliGeneric
-                        )];
+                        )?1:-1];
                 typedef char __cli_resource_expected_size
                         [24 == sizeof(
                                 struct CliResource
-                        )];
+                        )?1:-1];
                 typedef char __cli_collection_expected_size
                         [40 == sizeof(
                                 struct CliCollection
-                        )];
+                        )?1:-1];
                 typedef char __cli_toggle_expected_size
                         [16 == sizeof(
                                 struct CliToggle
-                        )];
+                        )?1:-1];
                 typedef char __cli_callback_context_expected_size
                         [120 == sizeof(
                                 struct CliCallbackContext
-                        )];
+                        )?1:-1];
                 typedef char __cli_action_expected_size
                         [16 == sizeof(
                                 struct CliAction
-                        )];
+                        )?1:-1];
                 typedef char __cli_contextualised_callback_expected_size
                         [128 == sizeof(
                                 struct CliContextualisedCallback
-                        )];
+                        )?1:-1];
                 typedef char __cli_registry_counters_expected_size
                         [0xFF == sizeof(
                                 struct CliRegistryCounters
-                        )];
+                        )?1:-1];
                 typedef char __cli_registry_expected_size
                         [136 == sizeof(
                                 struct CliRegistry
-                        )];
+                        )?1:-1];
                 typedef char __cli_context_expected_size
                         [264 == sizeof(
                                 struct CliContext
-                        )];
-                        
+                        )?1:-1];
+
         #elif !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_32)
                         typedef char no_expected_sizes[-1];
         #elif !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_16)

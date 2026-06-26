@@ -16,10 +16,10 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <STYPES.H>
+#include <stypes.h>
 
 #define CLI_COLLECTION_COUNT 2
-#define CLI_COLLECTION_MAX_CHILDREN 1
+#define CLI_COLLECTION_MAX_CHILDREN 4
 #define CLI_TOGGLE_COUNT 1
 #define CLI_GENERIC_TYPE_IDENTIFIERS resource_string
 #define CLI_GENERIC_VALUE_TYPES u8* string;

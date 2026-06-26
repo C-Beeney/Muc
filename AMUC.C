@@ -16,21 +16,16 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <AMUC.H>
-#include <SSYS.H>
-#include <UASSERT.H>
-#include <USTRING.H>
-#include <ACLI.H>
-#include <MTEST.H>
-
-#if 0
-#define print(s) assert(strlen((const u8*)(s))==write(STDOUT,(const u8*)(s),\
-                (const imax)strlen((const u8*)(s))))
-#endif
+#include <amuc.h>
+#include <ssys.h>
+#include <uassert.h>
+#include <ustring.h>
+#include <acli.h>
+#include <mtest.h>
 
 void prime_context(struct CliContext cli_context[1]);
 void prime_context(struct CliContext cli_context[1])
-{ 
+{
         const u8 *collection_with[2] = {(u8*)"abc", (u8*)0};
         const u8 *collection_as[2] = {(u8*)"def", (u8*)0};
         union CliGenericValue cli_generic_value = {(u8*)"Hello, World!"};
@@ -39,18 +34,20 @@ void prime_context(struct CliContext cli_context[1])
         cli_register_collection (cli_context, (u8*)"--as"   , collection_as);
         cli_register_toggle     (cli_context, (u8*)"--quiet", 0);
         cli_register_action     (cli_context, (u8*)"--test" , muc_test);
-        cli_register_resource   (cli_context, (u8*)"program:version", resource_string, cli_generic_value);
+        cli_register_resource   (cli_context, (u8*)"program:version",
+                resource_string,
+                cli_generic_value);
+        cli_register_verify(cli_context);
 }
 
 i8 main(i32 argc, u8 *argv[], u8 *env[])
 {
+
         struct CliContext cli_context[1];
 
         cli_init_context(cli_context);
 
         prime_context(cli_context);
-
-        cli_register_verify(cli_context);
 
         cli_parse_args(cli_context, argc, argv);
 

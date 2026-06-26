@@ -42,12 +42,12 @@
                 defined(__MSDOS__)
 
                 #define ARCH_16
-        
+
         #endif /*ARCH_CHECK*/
 
         /* -|---|- 2. Type Mapping based on Detection -|---|- */
 
-        #if 1 /* All applicable platforms support 8-bit containers */ 
+        #if 1 /* All applicable platforms support 8-bit containers */
                 typedef unsigned char u8;
                 typedef signed char   i8;
 
@@ -154,7 +154,7 @@
                         #define UMAX_MAX U32_MAX
                         #define UMAX_MIN U32_MIN
                 #endif
-                        
+
 
         #endif/*ARCH_64*/
 

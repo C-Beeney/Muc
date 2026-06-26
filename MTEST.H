@@ -16,6 +16,6 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <ACLI.H>
+#include <acli.h>
 
 void muc_test(const struct CliCallbackContext *context, u8 *rc);

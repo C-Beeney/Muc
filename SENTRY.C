@@ -16,10 +16,10 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#include <STYPES.H>
-#include <SSYS.H>
+#include <stypes.h>
+#include <ssys.h>
 
-#include <AMUC.H>
+#include <amuc.h>
 
 void entry(i32 argc, u8 ** argv, u8 ** env);
 

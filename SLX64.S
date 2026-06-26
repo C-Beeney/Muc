@@ -85,8 +85,8 @@ __assert_fail:
 
     /* 3. Write the actual failed expression string */
     /* Note: For simplicity, we assume a fixed length or you can call a strlen loop */
-    movq $1, %rax           
-    movq $2, %rdi           
+    movq $1, %rax
+    movq $2, %rdi
     movq %r12, %rsi         /* The pointer we saved */
     movq %r11, %rdx         /* Replace with actual length logic if needed */
     syscall

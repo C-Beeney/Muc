@@ -18,7 +18,7 @@
 
 #ifndef UASSERT_H
     #define UASSERT_H
-    #include <STYPES.H>
+    #include <stypes.h>
 
     extern void __assert_fail(char*,char*,i32,const char*);
 
@@ -26,6 +26,10 @@
         #define assert(expr) ((void)0)
     #else
         # define assert(expr) \
-            ((expr) ? (void)0 : __assert_fail(#expr, __FILE__, __LINE__, (const char*) __func__))
+            ((expr) ? (void)0 : __assert_fail(#expr, \
+                                              __FILE__, \
+                                              __LINE__, \
+                                              (const char*) \
+                                                      __func__))
     #endif
 #endif/*UASSERT_H*/

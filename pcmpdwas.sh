@@ -17,8 +17,8 @@
 #---------------------------------------------------------------------------*/
 
 clang \
-    -x c a*.c m*.c u*.c sentry.c \
-    -x assembler slx64.s \
+    -x c a*.c m*.c u*.c sentry.c sdwas.c \
+    -x c sdwas.c \
     -o out.elf \
     -flto -static -Wl,--gc-sections \
     -Os -s \

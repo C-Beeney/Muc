@@ -19,7 +19,7 @@
 #ifndef AMUC_H
 #define AMUC_H
 
-#include <STYPES.H>
+#include <stypes.h>
 
 
 i8 main(i32 argc, u8 *argv[], u8 *env[]);
