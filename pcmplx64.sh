@@ -25,7 +25,7 @@ clang \
     -nostdlib -nostdinc -nostartfiles \
     -I.\
     -Weverything -Wno-reserved-identifier -Wno-empty-translation-unit \
-    -Wno-unsafe-buffer-usage \
+    -Wno-unsafe-buffer-usage -Wno-c++-keyword\
     -ffreestanding -ffunction-sections -fdata-sections \
     -fvisibility=hidden \
     -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions \

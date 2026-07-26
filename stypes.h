@@ -19,7 +19,7 @@
 #ifndef PORTABLE_TYPES_H
 #define PORTABLE_TYPES_H
 
-        /* -|---|- 1. Basic Architecture Detection -|---|- */
+        /* Basic Architecture Detection */
 
         #if     defined(__LP64__)   || \
                 defined(_LP64)      || \
@@ -43,19 +43,16 @@
 
                 #define ARCH_16
 
-        #endif /*ARCH_CHECK*/
+        #endif /* ARCH_CHECK */
 
-        /* -|---|- 2. Type Mapping based on Detection -|---|- */
+        /* All applicable platforms support 8-bit types */
+        typedef unsigned char u8;
+        typedef signed char   i8;
 
-        #if 1 /* All applicable platforms support 8-bit containers */
-                typedef unsigned char u8;
-                typedef signed char   i8;
-
-                #define U8_MAX  ((u8)+0xFF)
-                #define U8_MIN  ((u8)+0x00)
-                #define I8_MAX  ((i8)+0x7F)
-                #define I8_MIN  ((i8)-0x80)
-        #endif
+        #define U8_MAX  ((u8) 0xFF)
+        #define U8_MIN  ((u8) 0x00)
+        #define I8_MAX  ((i8) 0x7F)
+        #define I8_MIN  ((i8)-0x80)
 
         #ifdef ARCH_16
 
@@ -64,10 +61,10 @@
                 typedef unsigned long  u32;
                 typedef signed long    i32;
 
-                #define U16_MAX   0xFFFF
-                #define U16_MIN   0x0000
-                #define I16_MAX   0x7FFF
-                #define I16_MIN (-0x8000)
+                #define U16_MAX ((u16) 0xFFFF)
+                #define U16_MIN ((u16) 0x0000)
+                #define I16_MAX ((i16) 0x7FFF)
+                #define I16_MIN ((i16)-0x8000)
 
                 typedef i16 imax;
                 typedef u16 umax;
@@ -87,15 +84,15 @@
         typedef unsigned int   u32;
         typedef signed int     i32;
 
-        #define U16_MAX   0xFFFF
-        #define U16_MIN   0x0000
-        #define I16_MAX   0x7FFF
-        #define I16_MIN (-0x8000)
+        #define U16_MAX ((u16) 0xFFFF)
+        #define U16_MIN ((u16) 0x0000)
+        #define I16_MAX ((i16) 0x7FFF)
+        #define I16_MIN ((i16)-0x8000)
 
-        #define U32_MAX   0xFFFFFFFF
-        #define U32_MIN   0x00000000
-        #define I32_MAX   0x7FFFFFFF
-        #define I32_MIN (-0x80000000)
+        #define U32_MAX ((u32) 0xFFFFFFFF)
+        #define U32_MIN ((u32) 0x00000000)
+        #define I32_MAX ((i32) 0x7FFFFFFF)
+        #define I32_MIN ((i32)-0x80000000)
 
         #endif/*ARCH_32/64*/
 
@@ -116,21 +113,21 @@
 
                         typedef unsigned __int64 u64;
                         typedef signed __int64   i64;
-                        #define U64_MAX   0xFFFFFFFFFFFFFFFFUI64
-                        #define U64_MIN   0x0000000000000000UI64
-                        #define I64_MAX   0x7FFFFFFFFFFFFFFFI64
-                        #define I64_MIN (-(I64_MAX)-1I64)
+                        #define U64_MAX ((u64) 0xFFFFFFFFFFFFFFFFULL)
+                        #define U64_MIN ((u64) 0x0000000000000000ULL)
+                        #define I64_MAX ((i64) 0x7FFFFFFFFFFFFFFFLL)
+                        #define I64_MIN ((i64)-0x8000000000000000LL)
                 #elif !defined(NO_COMPILER_EXTENSIONS)
                         #define INT64
 
                         __extension__ typedef unsigned long long u64;
                         __extension__ typedef signed long long   i64;
-                        #define U64_MAX ((u64)0xFFFFFFFFFFFFFFFFULL)
-                        #define U64_MIN ((u64)0x0000000000000000ULL)
-                        #define I64_MAX ((i64)0x7FFFFFFFFFFFFFFFLL)
-                        #define I64_MIN (-(I64_MAX)+1LL) /*TEST*/
+                        #define U64_MAX ((u64) 0xFFFFFFFFFFFFFFFFULL)
+                        #define U64_MIN ((u64) 0x0000000000000000ULL)
+                        #define I64_MAX ((i64) 0x7FFFFFFFFFFFFFFFLL)
+                        #define I64_MIN ((i64)-0x8000000000000000LL)
                 #else
-                        #undef INT64 /*Just incase*/
+                        #undef INT64
                         #define u64 no_u64_implementation
                         #define i64 no_i64_implementation
                 #endif
@@ -208,11 +205,11 @@
         #endif/*NO_STATIC_TYPE_ASSERTIONS*/
 
         #ifndef NO_PADDING
-                #define PAD8 u8:8
-                #define PAD16 u16:16
-                #define PAD32 u32:32
+                #define PAD8 u32:8;
+                #define PAD16 u32:16;
+                #define PAD32 u32:32;
                 #ifdef INT64
-                        #define PAD64 u64:64
+                        #define PAD64 u32:32;u32:32;
                 #endif/*INT64*/
         #else  /*NO_PADDING*/
                 #define PAD8

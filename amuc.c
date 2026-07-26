@@ -23,8 +23,7 @@
 #include <acli.h>
 #include <mtest.h>
 
-void prime_context(struct CliContext cli_context[1]);
-void prime_context(struct CliContext cli_context[1])
+static void prime_context(struct CliContext cli_context[1])
 {
         const u8 *collection_with[2] = {(u8*)"abc", (u8*)0};
         const u8 *collection_as[2] = {(u8*)"def", (u8*)0};
@@ -42,7 +41,6 @@ void prime_context(struct CliContext cli_context[1])
 
 i8 main(i32 argc, u8 *argv[], u8 *env[])
 {
-
         struct CliContext cli_context[1];
 
         cli_init_context(cli_context);

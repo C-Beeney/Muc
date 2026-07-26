@@ -18,29 +18,78 @@
 
 #include <ustring.h>
 #include <uassert.h>
-umax strlen(const u8 *buffer) {
-        umax len = (umax) -1;
-        assert(buffer && "Buffer may not be null.");
+
+imax
+strlen(
+        const u8 *buffer
+) {
+        imax len = -1;
+        assert(buffer);
         while(buffer[++len]);
         return len;
 }
 
-u8 streq(
-        const u8 buffer0[],
-        const u8 buffer1[]
+u8
+streq(
+        const u8 *buffer0,
+        const u8 *buffer1
 ) {
-        umax idx = UMAX_MAX;
+        umax idx = 0;
 
-        assert(buffer0 && "Buffer0 may not be null.");
-        assert(buffer1 && "Buffer1 may not be null.");
+        assert(buffer0);
+        assert(buffer1);
 
         while(
-                buffer0[++idx] && buffer1[idx] &&
-                buffer0[  idx] == buffer1[idx]
-        );
+                buffer0[idx] && buffer1[idx] &&
+                buffer0[idx] == buffer1[idx]
+        ) ++idx;
 
         return (
                 buffer0[idx] ==
                 buffer1[idx]
         );
+}
+
+u8*
+itoa(
+    imax i  ,
+    u8  *arr
+) {
+    imax idx = 0;
+    imax start = 0;
+    imax end;
+    u8 *base = arr;
+
+    umax u;
+    if (i < 0) {
+        *arr++ = '-';
+        u = (umax)(-(umax)i);
+    } else {
+        u = (umax)i;
+    }
+
+    if (u == 0) {
+        arr[idx++] = '0';
+        arr[idx] = 0;
+        return base;
+    }
+
+    while (u > 0) {
+        arr[idx++] = (u8)('0' + (u % 10));
+        u /= 10;
+    }
+
+    arr[idx] = 0;
+
+    end = idx - 1;
+
+    while (start < end) {
+        u8 tmp = arr[start];
+        arr[start] = arr[end];
+        arr[end] = tmp;
+        start++;
+        end--;
+    }
+
+    return base;
 }

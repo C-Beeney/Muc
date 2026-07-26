@@ -82,7 +82,7 @@
         struct CliGeneric {
                 union CliGenericValue value;
                 enum CliGenericType   type;
-                PAD32;
+                PAD32
         };
 
         struct CliResource {
@@ -99,9 +99,7 @@
                 const u8 *name;
                 u8        value;
 
-                PAD8;
-                PAD16;
-                PAD32;
+                PAD8 PAD16 PAD32
         };
 
         struct CliCallbackContext {

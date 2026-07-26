@@ -16,18 +16,31 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-#ifndef SSYS_H
-#define SSYS_H
-    #include <stypes.h>
+#include <uassert.h>
+#include <ssys.h>
+#include <ustring.h>
 
-    #define STDIN       ((const u32)0)
-    #define STDOUT      ((const u32)1)
-    #define STDERR      ((const u32)2)
+void
+__assert_fail(
+    const u8 *expr,
+    const u8 *file,
+    const i32 line,
+    const u8 *func
+) {
 
-    extern u32  read  (const u32 fh  , u8* buffer, const imax count);
-    extern u32  write (const u32 fh  , const u8 *buffer, const imax count);
-    extern u32  open  (const u8 *path, const u32 mode);
-    extern void close (const u32 fh);
-    extern void exit  (const i8 ec);
-    extern void abort (void);
-#endif/*SSYS_H*/
+    u8 line_buf[64];
+
+    write(STDERR, (const u8*) "Assertion failed: ", 19          );
+    write(STDERR, (const u8*) expr                , strlen((const u8*)expr));
+    write(STDERR, (const u8*) "\n"                , 1);
+
+    write(STDERR, (const u8*) file, strlen((const u8*)file));
+    write(STDERR, (const u8*) " -> ", 4);
+    write(STDERR, (const u8*) func, strlen((const u8*)func));
+    write(STDERR, (const u8*) " at line ", 10);
+    itoa((imax) line, line_buf);
+    write(STDERR, (const u8*) line_buf, strlen(line_buf));
+    write(STDERR, (const u8*) "\n", 1);
+
+    abort();
+}

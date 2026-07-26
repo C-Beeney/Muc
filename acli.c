@@ -45,10 +45,10 @@ cli_register_toggle(
 
         struct CliToggle *this;
 
-        assert(context                    && "Toggle.");
-        assert(name                       && "Toggle.");
-        assert((0 == value || 1 == value) && "Toggle.");
-        assert(counter < CLI_TOGGLE_COUNT && "Toggle.");
+        assert(context);
+        assert(name);
+        assert((0 == value || 1 == value));
+        assert(counter < CLI_TOGGLE_COUNT);
 
         this = context->registry->toggle + counter;
 
@@ -67,10 +67,10 @@ cli_register_collection(
         struct CliCollection *this;
         imax copy_index;
 
-        assert(context                        && "Collection.");
-        assert(name                           && "Collection.");
-        assert(value                          && "Collection.");
-        assert(counter < CLI_COLLECTION_COUNT && "Collection.");
+        assert(context);
+        assert(name);
+        assert(value);
+        assert(counter < CLI_COLLECTION_COUNT);
 
         this = context->registry->collection + counter;
 
@@ -90,10 +90,10 @@ cli_register_action(
 
         struct CliAction *this;
 
-        assert(context                    && "Action.");
-        assert(name                       && "Action.");
-        assert(callback                   && "Action.");
-        assert(counter < CLI_ACTION_COUNT && "Action.");
+        assert(context);
+        assert(name);
+        assert(callback);
+        assert(counter < CLI_ACTION_COUNT);
 
         this = context->registry->action + counter;
 
@@ -112,11 +112,11 @@ cli_register_resource(
 
         struct CliResource *this;
 
-        assert(context                      && "Resource.");
-        assert(name                         && "Resource.");
-        assert(type >= 0                    && "Resource.");
-        assert(type < CLI_GENERIC_MAX       && "Resource.");
-        assert(counter < CLI_RESOURCE_COUNT && "Resource.");
+        assert(context);
+        assert(name);
+        assert(type >= 0);
+        assert(type < CLI_GENERIC_MAX);
+        assert(counter < CLI_RESOURCE_COUNT);
 
         this = context->registry->resource + counter;
 
@@ -145,65 +145,77 @@ cli_register_verify(
 }
 
 static void
-cli_parse_args_verify_action_tag(
+cli_verify_action_tag(
         const struct CliRegistry registry[1],
         const u8               name        [] ,
         u8                     rc          [1]
 ) {
-
         const struct CliAction *actions = registry->action;
-        umax action_index_max = registry->counters->action;
+        umax action_index_max = registry->counters->action;        
+        umax index;
 
-        umax index = UMAX_MAX;
+        *rc = 0;
 
-        for(;
-                ++index < action_index_max;
-                *rc = streq(actions[index].name, name)
-        ) if (*rc) return;
+        for(
+                index = 0;
+                index <= action_index_max;
+                ++index
+        ) {
+                *rc = streq(actions[index].name, name);
+                if (*rc) { return; }
+        }
 }
 
 static void
-cli_parse_args_verify_collection_tag(
+cli_verify_collection_tag(
         const struct CliRegistry   registry [1],
         const u8                   name     [] ,
         u8                         rc       [1]
 ) {
         const struct CliCollection *collections = registry->collection;
         umax collection_index_max = registry->counters->collection;
+        umax index;
 
-        umax index = UMAX_MAX;
-
-        for(;;) {
-                index += 1;
-                if(index > collection_index_max) break;
+        *rc = 0;
+        
+        for (   index = 0;
+                index <= collection_index_max;
+                ++index
+        ) {
                 *rc = streq(collections[index].name, name);
                 if (*rc) { return; }
         }
 }
 
 static void
-cli_parse_args_verify_toggle_tag(
+cli_verify_toggle_tag(
         const struct CliRegistry registry    [1],
         const u8                 name        [] ,
         u8                       rc          [1]
 ) {
         const struct CliToggle *toggles = registry->toggle;
         umax toggle_index_max = registry->counters->toggle;
-        umax index = UMAX_MAX;
+        umax index;
+
         *rc = 0;
-        for(;
-                ++index < toggle_index_max;
-                *rc = streq(toggles[index].name, name)
-        ) if (*rc) return;
+
+        for(
+                index = 0;
+                index <= toggle_index_max;
+                ++index
+        ) {
+                *rc = streq(toggles[index].name, name);
+                if (*rc) { return; }
+        }
 }
 
 static void
-cli_parse_args_verify_tag(
+cli_verify_tag(
         const struct CliRegistry registry[1],
         const u8                 tag[] ,
         u8                       rc[1]
 ) {
-        cli_parse_args_verify_action_tag(
+        cli_verify_action_tag(
                 registry,
                 tag,
                 rc);
@@ -211,7 +223,7 @@ cli_parse_args_verify_tag(
                 return;
         }
 
-        cli_parse_args_verify_collection_tag(
+        cli_verify_collection_tag(
                 registry,
                 tag,
                 rc);
@@ -219,86 +231,104 @@ cli_parse_args_verify_tag(
                 return;
         }
 
-        cli_parse_args_verify_toggle_tag(
+        cli_verify_toggle_tag(
                 registry,
                 tag,
                 rc);
 }
 
 static void
-cli_parse_args_parse_collection(
+cli_parse_collection(
         const struct CliRegistry registry  [1],
         struct CliCollection     collection[1],
         u8                      *argv[]       ,
         umax                     argv_index[1],
         const i32                argc
 ) {
-        umax index = UMAX_MAX;
+        umax index = 0;
         u8 rc[1];
 
-        for(;;) {
-                index += 1; 
+        collection->name = argv[*argv_index];
+
+        for(;;++index) {
+                
                 *argv_index += 1;
 
                 assert(argc >= 0);
                 if(*argv_index >= (umax)argc) { return; }
 
-                cli_parse_args_verify_tag(registry, argv[*argv_index], rc);
+                cli_verify_tag(registry, argv[*argv_index], rc);
 
                 if(*rc) { break; }
+                
                 assert(index >= 0 && (index) < CLI_COLLECTION_MAX_CHILDREN);
                 collection->value[index] = argv[*argv_index];
                 assert(argc >= 0);
                 if(*argv_index >= (umax) argc) {
-                        assert(0 && "Invalid syntax!");
+                        assert(0 && "Invalid syntax!"); /* TODO: Change to proper error reporting */
                 }
         }
 
         return;
 }
 
+static void
+cli_handle_toggle(
+        struct CliToggle *this
+) {
+        if(this->value != 0) {
+                assert(0 && "Toggled 2x! -- REPLACE WITH ERROR!!!");
+                exit(127);
+        }
+}
+
+
 struct InitialStateCounters {
-  umax collection;
-  umax toggle;
+        umax collection;
+        umax toggle;
 };
 
 struct InitialState {
-  struct CliCollection collection[CLI_COLLECTION_COUNT];
-  struct CliToggle     toggle    [CLI_TOGGLE_COUNT];
+        struct CliCollection collection[CLI_COLLECTION_COUNT];
+        struct CliToggle     toggle    [CLI_TOGGLE_COUNT];
 
-  struct InitialStateCounters counters;
-  /*MAYBE PADDING*/
+        struct InitialStateCounters counters;
+        /*MAYBE PADDING*/
 };
 
 static void
-cli_parse_args_parse_initial_state(
+cli_parse_initial_state(
         struct InitialState initial_state[1],
         struct CliRegistry  registry     [1],
         u8                 *argv         [] ,
         umax                argv_index   [1],
-        i32                 argc            ,
+        const i32           argc            ,
         u8                  rc[1]
 
 
 ) {
-        for(;;) {
-                assert(argc >= 0);
-                if(*argv_index >= (umax) argc) break;
-                cli_parse_args_verify_toggle_tag(
+        assert(argc >= 0);
+
+        for(
+                *rc = 0;
+                *argv_index < (umax) argc;
+                *argv_index += 1
+        ) {
+
+                cli_verify_toggle_tag(
                         registry,
                         argv[*argv_index],
                         rc);
                 if(*rc) {
                         umax toggle_count =
                                 initial_state->counters.toggle ++;
-                        struct CliToggle *toggles =
-                                initial_state->toggle;
-                        if(toggles[toggle_count].value != 0) {
-                                assert(0 && "Toggled 2x!");
-                        }
+                        struct CliToggle *this =
+                                initial_state->toggle + toggle_count;
+                        cli_handle_toggle(
+                                this);
                         continue;
                 }
-                cli_parse_args_verify_collection_tag(
+                cli_verify_collection_tag(
                         registry,
                         argv[*argv_index],
                         rc);
@@ -308,16 +338,17 @@ cli_parse_args_parse_initial_state(
                                 initial_state->counters.collection ++;
                         struct CliCollection *collections =
                                 initial_state->collection;
-                        cli_parse_args_parse_collection(
+                        cli_parse_collection(
                                 registry,
                                 collections + collection_count,
                                 argv,
                                 argv_index,
                                 argc);
+                        *argv_index -=1;
                         continue;
                 }
 
-                cli_parse_args_verify_action_tag(
+                cli_verify_action_tag(
                         registry,
                         argv[*argv_index],
                         rc);
@@ -325,11 +356,42 @@ cli_parse_args_parse_initial_state(
                 if(*rc) {
                         break;
                 }
-                *argv_index = *argv_index + 1;
         }
 
-        *argv_index -= 1;
+        --*argv_index;
         return;
+}
+
+static void
+cli_print_collection(
+        const struct CliCollection collection[1]
+){
+        umax j = 0;
+
+        write(STDOUT, (u8*)"\n\t", 2);
+        write(STDOUT, collection->name, strlen(collection->name));
+        write(STDOUT, (u8*)":\n", 2);
+
+        while(collection->value[j]) {
+                imax value_length = strlen(collection->value[j]);
+                write(STDOUT, (u8*)"\t\t", 2);
+                write(STDOUT, collection->value[j], value_length);
+                write(STDOUT, (u8*)"\n", 1);
+                j += 1;
+        }
+}
+
+static void
+cli_print_collections(
+        const struct CliCollection *collections ,
+        const umax                  collection_count
+) {
+        umax i = 0;
+        write(STDOUT, (u8*)"Collections:", 13);
+        for (i=0; i < collection_count; ++i) {
+                cli_print_collection(collections + i);
+        }
+        write(STDOUT, (u8*)"\n", 1);
 }
 
 void
@@ -350,39 +412,32 @@ cli_parse_args(
         umax argv_index = 1;
         u8 next_is_tag = 1;
         u8 rc[1];
+
         (void)callback;
-        cli_parse_args_parse_initial_state(
+        cli_parse_initial_state(
                 initial_state,
                 registry,
                 argv,
                 &argv_index,
                 argc,
                 rc);
+                
         assert(argc >= 0);
         if(argv_index >= (umax)argc) {
                 assert(0&& "There is no action in cli args!");
         }
 
-        {
-                umax i = 0;
-                write(STDOUT, (u8*)"weewoo\n", 7);
-                for (i=0; i < initial_state->counters.collection; ++i) {
-                        umax j = 0;
-                        write(STDOUT, (u8*)"hoy\n", 4);
+        cli_print_collections(
+                initial_state->collection,
+                initial_state->counters.collection);
 
-                        write(STDOUT, initial_state->collection[i].name, (imax)strlen(initial_state->collection[i].name));
-                        while(initial_state->collection[i].value[j]) {
-                                write(STDOUT, (u8*)"hey\n", 4);
-                                write(STDOUT, initial_state->collection[i].value[j], (imax)strlen(initial_state->collection[i].value[j]));
-                                j += 1;
-                        }
-                }
-                write(STDOUT, (u8*)"woowee?\n", 8);
-        }
+
+        write(STDOUT, (u8*)"WeeWee?!\n", 9);
         for(;
                 0 != next_is_tag;
                 ++ argv_index
         ) {
+                /*write(STDOUT, (u8*)"I AM GEOFF!!!\n", 14); *//*                                      TODO TODO TODO */
                 /* Code goes here (todo) */
 
 
@@ -401,7 +456,7 @@ cli_parse_args(
                 /* Ensure we update next_is_tag */
                 assert(argc >= 0);
                 if(argv_index+1 < (umax) argc)
-                        cli_parse_args_verify_tag(
+                        cli_verify_tag(
                                 registry,
                                 argv[argv_index+1],
                                 &next_is_tag);
