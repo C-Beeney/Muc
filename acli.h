@@ -35,20 +35,18 @@
         #ifndef CLI_COLLECTION_COUNT
                 #define CLI_COLLECTION_COUNT -1
         #endif/*CLI_COLLECTION_COUNT*/
-        #ifndef CLI_COLLECTION_MAX_CHILDREN
-                #define CLI_COLLECTION_MAX_CHILDREN -1
-        #endif/*CLI_COLLECTION_MAX_CHILDREN*/
+        #ifndef CLI_COLLECTION_MAX_STARTS
+                #define CLI_COLLECTION_MAX_STARTS 3
+        #endif/*CLI_COLLECTION_MAX_STARTS*/
         #ifndef CLI_TOGGLE_COUNT
                 #define CLI_TOGGLE_COUNT -1
         #endif/*CLI_TOGGLE_COUNT*/
-        #ifndef CLI_GENERIC_TYPE_IDENTIFIERS
-                #define CLI_GENERIC_TYPE_IDENTIFIERS \
-                        resource_types_must_be_defined
-        #endif/*GENERIC_TYPES*/
-        #ifndef CLI_GENERIC_VALUE_TYPES
-                #define CLI_GENERIC_VALUE_TYPES \
-                        resource_values_must_be_defined
-        #endif/*GENERIC_VALUES*/
+        #ifndef CLI_RESOURCE_IDENTS
+                #define CLI_RESOURCE_IDENTS resource_idents_undefined
+        #endif/*CLI_RESOURCE_IDENTS*/
+        #ifndef CLI_RESOURCE_TYPES
+                #define CLI_RESOURCE_TYPES resource_types_undefined
+        #endif/*CLI_RESOURCE_TYPES*/
         #ifndef CLI_RESOURCE_COUNT
                 #define CLI_RESOURCE_COUNT -1
         #endif/*CLI_RESOURCE_COUNT*/
@@ -56,147 +54,274 @@
                 #define CLI_ACTION_COUNT -1
         #endif/*CLI_ACTION_COUNT*/
         #ifndef CLI_MAX_ACTIONS
-                #define CLI_MAX_ACTIONS -1
+                #define CLI_MAX_ACTIONS 4
         #endif/*CLI_MAX_ACTIONS*/
 
         #ifndef NO_STATIC_CLI_ASSERTIONS
                 typedef char __collections_count_is_defined
-                        [CLI_COLLECTION_COUNT        != -1 ?1 :-1];
-                typedef char __collections_max_children_is_defined_assertion
-                        [CLI_COLLECTION_MAX_CHILDREN != -1 ?1 :-1];
+                        [CLI_COLLECTION_COUNT != -1 ?1 :-1];
                 typedef char __toggles_count_is_defined
-                        [CLI_TOGGLE_COUNT            != -1 ?1 :-1];
+                        [CLI_TOGGLE_COUNT     != -1 ?1 :-1];
                 typedef char __resources_count_is_defined
-                        [CLI_RESOURCE_COUNT          != -1 ?1 :-1];
+                        [CLI_RESOURCE_COUNT   != -1 ?1 :-1];
                 typedef char __actions_count_is_defined
-                        [CLI_ACTION_COUNT           != -1 ?1 :-1];
+                        [CLI_ACTION_COUNT     != -1 ?1 :-1];
+                typedef char __macros_count_is_defined
+                        [CLI_MACRO_COUNT      != -1 ?1 :-1];
+                typedef char __aliases_count_is_defined
+                        [CLI_ALIAS_COUNT      != -1 ?1 :-1];
         #endif/*NO_STATIC_CLI_ASSERTIONS*/
 
 /*--------------------------------------------------------------------------*/
 /* Structure definitions                                                    */
 /*--------------------------------------------------------------------------*/
 
-        union CliGenericValue {void *_; CLI_GENERIC_VALUE_TYPES};
-        enum  CliGenericType  {CLI_GENERIC_TYPE_IDENTIFIERS, CLI_GENERIC_MAX};
+        union CliResourceValue {
+                CLI_RESOURCE_TYPES
+                PAD(2,4,8)
+        };
 
-        struct CliGeneric {
-                union CliGenericValue value;
-                enum CliGenericType   type;
-                PAD32
+        enum  CliResourceType  {
+                CLI_RESOURCE_IDENTS,
+                CLI_RESOURCE_IDENT_COUNT
+        };
+
+        struct CliResourceBinding {
+                union CliResourceValue value;
+                enum CliResourceType   type;
+                PAD(    (8-sizeof(enum CliResourceType))%2,
+                        (8-sizeof(enum CliResourceType))%4,
+                        (8-sizeof(enum CliResourceType))%8)
         };
 
         struct CliResource {
-                const u8         *name;
-                struct CliGeneric value[1];
+                const u8                 *name;
+                struct CliResourceBinding value[1];
         };
 
         struct CliCollection {
                 const u8 *name;
-                const u8 *value[CLI_COLLECTION_MAX_CHILDREN];
+
+                /* These variables are intended for use with argv's data.
+                 * start signifies the index of the first argv value in the
+                 * collection. Each following start represents just that,
+                 * continue parsing the collection from that point. A segment
+                 * ends when it typically would syntactically. length signifies
+                 * the number of argv values in the collection.
+                 * */
+                u16 start[CLI_COLLECTION_MAX_STARTS]
+                ,   length;
+        };
+
+        struct CliCollectionIterator {
+                const struct CliCallbackContext *ctx;
+                const struct CliCollection      *collection;
+                u16                              offset;
+                u8                               chunk;
         };
 
         struct CliToggle {
                 const u8 *name;
                 u8        value;
 
-                PAD8 PAD16 PAD32
+                PAD(1, 3, 7)
+        };
+
+        struct CliOwnableContextCounters {
+                u8 collection, toggle;
+
+                PAD(0,2,6)
+        };
+
+        struct CliOwnableContext {
+                struct CliCollection collection [CLI_COLLECTION_COUNT];
+                struct CliToggle     toggle     [CLI_TOGGLE_COUNT];
+                struct CliOwnableContextCounters counter[1];
         };
 
         struct CliCallbackContext {
-                const struct CliCollection collection[CLI_COLLECTION_COUNT];
-                const struct CliToggle     toggle[CLI_TOGGLE_COUNT];
-                const struct CliResource   resource[CLI_RESOURCE_COUNT];
+                struct CliOwnableContext   owned[1];
+                const struct CliResource **resource;
+                const struct CliArgData   *arg;
         };
 
-        typedef void (*CliCallback)(
-                const struct CliCallbackContext context[1],
-                u8                              rc[1]
+        typedef void (*CliCallbackFunction)(
+                const struct CliCallbackContext context [1],
+                u8                              rc      [1]
         );
 
         struct CliAction {
-                const u8   *name;
-                CliCallback callback;
+                const u8           *name;
+                CliCallbackFunction callback;
         };
 
-        struct CliContextualisedCallback {
+        /* Example macro: [name = install] [sequence = 'dicp'] [expanded = "-dicp"] [expanded = "--download --install --clear-cache --with-package-names"]*/
+        struct CliMacro {
+                const u8 *name;
+                const u8 *shortcuts;
+        };
+
+        /* Example alias: [name = ins] [expanded = "install"] */
+        /* Example alias: [name = -d] [expanded = "--download"] */
+        /* Example full expansion with macro: [n] -> --new-muc --compression best --crc 32 --props posix+ --format latest --as */
+        struct CliAlias {
+                const u8 *name;
+                const u8 *expanded;
+        };
+
+        struct CliCallback {
                 struct CliCallbackContext context[1];
-                CliCallback               callback;
+                CliCallbackFunction       callback;
+        };
+
+        struct CliCallbackIterator {
+
         };
 
         struct CliRegistryCounters {
-                umax action;
-                umax collection;
-                umax toggle;
-                umax resource;
+                u8 action, collection, toggle, resource, macro, alias;
+
+                PAD(0, 2, 2)
         };
 
         struct CliRegistry {
-                struct CliAction           action     [CLI_ACTION_COUNT];
-                struct CliCollection       collection [CLI_COLLECTION_COUNT];
-                struct CliToggle           toggle     [CLI_TOGGLE_COUNT];
-                struct CliResource         resource   [CLI_RESOURCE_COUNT];
-                struct CliRegistryCounters counters   [1];
+                struct CliAction            action [CLI_ACTION_COUNT];
+                struct CliCollection    collection [CLI_COLLECTION_COUNT];
+                struct CliToggle            toggle [CLI_TOGGLE_COUNT];
+                struct CliResource        resource [CLI_RESOURCE_COUNT];
+                struct CliMacro              macro [CLI_MACRO_COUNT];
+                struct CliAlias              alias [CLI_ALIAS_COUNT];
+                struct CliRegistryCounters counter [1];
+        };
+
+        struct CliArgData {
+                const u8 **args;
+                u32        count;
+                u32        index;
         };
 
         struct CliContext {
-                struct CliRegistry               registry[1];
-                struct CliContextualisedCallback callback[CLI_MAX_ACTIONS];
+                struct CliRegistry       registry       [1];
+                struct CliOwnableContext common_context [1];
+                struct CliArgData        args           [1];
         };
 
 /*--------------------------------------------------------------------------*/
 /* Function declarations                                                    */
 /*--------------------------------------------------------------------------*/
 
-        void cli_init_context(
+        void
+        cli_init_context(
                 struct CliContext context[1]
         );
 
-        void cli_register_verify(
+        void
+        cli_register_verify(
                 const struct CliContext context[1]
         );
 
-        void cli_register_toggle(
+        void
+        cli_register_toggle(
                 struct CliContext context[1],
-                const u8          name[],
-                const u8          value
+                const u8          name    []
         );
 
-        void cli_register_collection(
+        void
+        cli_register_collection(
                 struct CliContext context[1],
-                const u8          name[],
-                const u8         *value[CLI_COLLECTION_MAX_CHILDREN]
+                const u8          name    []
         );
 
-        void cli_register_action(
+        void
+        cli_register_action(
                 struct CliContext context[1],
-                const u8          name[],
-                const CliCallback callback
+                const u8          name    [],
+                const CliCallbackFunction callback
         );
 
-        void cli_register_resource(
+        void
+        cli_register_resource(
                 struct CliContext     context[1],
-                const u8              name[],
-                const enum CliGenericType   type,
-                const union CliGenericValue value
+                const u8              name    [],
+                const enum CliResourceType   type,
+                const union CliResourceValue value
         );
 
-        void cli_parse_args(
-                struct CliContext context[1],
-                const i32 argc,
-                u8 *argv[]
+        void
+        cli_register_macro(
+                struct CliContext context [1],
+                const u8          name     [],
+                const u8          shortcuts[]
         );
+
+        void
+        cli_register_alias(
+                struct CliContext context[1],
+                const u8          name    [],
+                const u8          expanded[]
+        );
+
+        void
+        cli_register_args(
+                struct CliContext context[1],
+                const u8         *argv    [],
+                const s32         argc
+        );
+
+        void
+        cli_parse_init(
+                struct CliContext context[1],
+                u8                rc     [1]
+        );
+        
+        void
+        cli_parse_callback(
+                struct CliContext context[1],
+                u8                rc     [1]
+        );
+
+        void
+        cli_execute_callback(
+                struct CliContext context[1],
+                u8                rc     [1]
+        );
+
+        void
+        cli_reset_parse(
+                struct CliContext context[1]
+        );
+
+        struct CliCollectionIterator*
+        cli_collection_begin(
+                struct CliCollectionIterator    it[1],
+                const struct CliCallbackContext ctx[1],
+                const u8                       *name
+        );
+
+        const u8*
+        cli_collection_next(
+                struct CliCollectionIterator    *it
+        );
+
+        void
+        cli_collection_reset(
+                struct CliCollectionIterator *it
+        );
+
+        /* void cli_execute(); not yet */
+
 
         #if !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_64)
                 typedef char __cli_generic_expected_size
                         [16  == sizeof(
-                                struct CliGeneric
+                                struct CliResourceBinding
                         )?1:-1];
                 typedef char __cli_resource_expected_size
-                        [24 == sizeof(
+                        [(8 + sizeof(struct CliResourceBinding)) == sizeof(
                                 struct CliResource
                         )?1:-1];
                 typedef char __cli_collection_expected_size
-                        [40 == sizeof(
+                        [(8 + CLI_COLLECTION_MAX_CHILDREN * 8) == sizeof(
                                 struct CliCollection
                         )?1:-1];
                 typedef char __cli_toggle_expected_size
@@ -204,27 +329,41 @@
                                 struct CliToggle
                         )?1:-1];
                 typedef char __cli_callback_context_expected_size
-                        [120 == sizeof(
-                                struct CliCallbackContext
+                        [(      sizeof(struct CliCollection)*
+                                        CLI_COLLECTION_COUNT +
+                                sizeof(struct CliToggle)*CLI_TOGGLE_COUNT +
+                                sizeof(struct CliResource)*CLI_RESOURCE_COUNT)
+                                 == sizeof(struct CliCallbackContext
                         )?1:-1];
                 typedef char __cli_action_expected_size
-                        [16 == sizeof(
+                        [(8+sizeof(CliCallbackFunction)) == sizeof(
                                 struct CliAction
                         )?1:-1];
                 typedef char __cli_contextualised_callback_expected_size
-                        [128 == sizeof(
-                                struct CliContextualisedCallback
+                        [(      sizeof(struct CliCallbackContext) +
+                                sizeof(CliCallbackFunction))
+                                 == sizeof( struct CliCallback
                         )?1:-1];
                 typedef char __cli_registry_counters_expected_size
-                        [0xFF == sizeof(
+                        [16 == sizeof(
                                 struct CliRegistryCounters
                         )?1:-1];
                 typedef char __cli_registry_expected_size
-                        [136 == sizeof(
+                        [(
+                                sizeof(struct CliAction)
+                                        * CLI_ACTION_COUNT +
+                                sizeof(struct CliCollection)
+                                        * CLI_COLLECTION_COUNT +
+                                sizeof(struct CliToggle)
+                                        * CLI_TOGGLE_COUNT +
+                                sizeof(struct CliResource)
+                                        * CLI_RESOURCE_COUNT +
+                                sizeof(struct CliRegistryCounters)
+                        ) == sizeof(
                                 struct CliRegistry
                         )?1:-1];
                 typedef char __cli_context_expected_size
-                        [264 == sizeof(
+                        [sizeof(
                                 struct CliContext
                         )?1:-1];
 
@@ -241,7 +380,7 @@
         #define CLI_ACTION_GET_TOGGLE(name) \
                 cli_action_get_toggle(context, "--" #name)
         #define CLI_ACTION_GET_COLLECTION(name) \
-                cli_action_get_collection(context, "--", #name)
+                cli_action_get_collection(context, "--" #name)
 
         #define CLI_ACTION_CONTEXT_UNUSED (void) context
         #define CLI_ACTION_SET_EXIT_CODE(ec) *rc=ec

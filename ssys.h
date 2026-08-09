@@ -24,10 +24,10 @@
     #define STDOUT      ((const u32)1)
     #define STDERR      ((const u32)2)
 
-    extern u32  read  (const u32 fh  , u8* buffer, const imax count);
-    extern u32  write (const u32 fh  , const u8 *buffer, const imax count);
+    extern u32  read  (const u32 fh  , u8* buffer, const smax count);
+    extern u32  write (const u32 fh  , const u8 *buffer, const smax count);
     extern u32  open  (const u8 *path, const u32 mode);
     extern void close (const u32 fh);
-    extern void exit  (const i8 ec);
+    extern void exit  (const s8 ec);
     extern void abort (void);
 #endif/*SSYS_H*/

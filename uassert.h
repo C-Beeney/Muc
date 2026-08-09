@@ -20,7 +20,7 @@
     #define UASSERT_H
     #include <stypes.h>
 
-    extern void __assert_fail(const u8*, const u8*, const i32, const u8*);
+    extern void __assert_fail(const u8*, const u8*, const s32, const u8*);
 
     #ifdef NDEBUG
         #define assert(expr) ((void)0)
@@ -28,7 +28,7 @@
         # define assert(expr) \
             ((expr) ? (void)0 : __assert_fail((const u8*)#expr    , \
                                               (const u8*)__FILE__ , \
-                                              (const i32)__LINE__ , \
+                                              (const s32)__LINE__ , \
                                               (const u8*) __func__))
     #endif
 #endif/*UASSERT_H*/

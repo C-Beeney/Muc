@@ -16,24 +16,13 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
-.att_syntax
-
 .globl  read
-.type   read    , @function
 .globl  write
-.type   write   , @function
 .globl  open
-.type   open    , @function
 .globl  close
-.type   close   , @function
 .globl  exit
-.type   exit    , @function
 .globl  abort
-.type   abort   , @function
 .globl  _start
-.type   _start  , @function
-
-.section .text
 
 read:
     movq    $0  , %rax
@@ -83,5 +72,3 @@ _start:
     andq $-16, %rsp                    /* sp is 16-byte aligned */
 
     call entry
-
-.section .note.GNU-stack

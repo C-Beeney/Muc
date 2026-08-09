@@ -21,15 +21,19 @@ clang \
     -x assembler slx64.s \
     -o out.elf \
     -flto -static -Wl,--gc-sections \
-    -Os -s \
+    -Oz -s \
     -nostdlib -nostdinc -nostartfiles \
     -I.\
     -Weverything -Wno-reserved-identifier -Wno-empty-translation-unit \
-    -Wno-unsafe-buffer-usage -Wno-c++-keyword\
+    -Wno-unsafe-buffer-usage -Wno-c++-keyword -Wno-c2y-extensions\
     -ffreestanding -ffunction-sections -fdata-sections \
-    -fvisibility=hidden \
+    -fvisibility=hidden -fno-stack-check -fno-pic -fno-pie \
     -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions \
-    -fno-stack-protector \
-    -Werror \
-    -ansi \
+    -fno-stack-protector -fno-builtin -fno-common -mno-implicit-float \
+    -DNO_COMPILER_EXTENSIONS \
+    -Werror --target=x86_64-pc-linux -Wl,-T,slx64.ld \
+    -mno-sse -mno-sse2 -mno-mmx -msoft-float \
+    -ansi -mno-red-zone -Wl,--icf=all -fmerge-all-constants -fuse-ld=lld \
     $@
+    
+sstrip out.elf

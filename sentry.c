@@ -21,11 +21,11 @@
 
 #include <amuc.h>
 
-void entry(i32 argc, u8 ** argv, u8 ** env);
+void entry(const s32 argc, const u8 ** argv, const u8 ** env);
 
-void entry(i32 argc, u8 ** argv, u8 ** env) {
+void entry(const s32 argc, const u8 ** argv, const u8 ** env) {
 
-    i8 rc;
+    s8 rc;
 
     rc = main(argc, argv, env);
 

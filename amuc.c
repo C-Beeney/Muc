@@ -25,31 +25,54 @@
 
 static void prime_context(struct CliContext cli_context[1])
 {
-        const u8 *collection_with[2] = {(u8*)"abc", (u8*)0};
-        const u8 *collection_as[2] = {(u8*)"def", (u8*)0};
-        union CliGenericValue cli_generic_value = {(u8*)"Hello, World!"};
+        union CliResourceValue cli_generic_value;
+        cli_generic_value.string = (u8*)"A very alpha version!";
 
-        cli_register_collection (cli_context, (u8*)"--with" , collection_with);
-        cli_register_collection (cli_context, (u8*)"--as"   , collection_as);
-        cli_register_toggle     (cli_context, (u8*)"--quiet", 0);
-        cli_register_action     (cli_context, (u8*)"--test" , muc_test);
+        cli_register_collection (cli_context, (u8*)"with");
+        cli_register_collection (cli_context, (u8*)"as");
+        cli_register_toggle     (cli_context, (u8*)"quiet");
+        cli_register_action     (cli_context, (u8*)"test" , muc_test);
         cli_register_resource   (cli_context, (u8*)"program:version",
                 resource_string,
                 cli_generic_value);
         cli_register_verify(cli_context);
 }
 
-i8 main(i32 argc, u8 *argv[], u8 *env[])
+s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
 {
+        u8 rc[1] = {0};
         struct CliContext cli_context[1];
+        const volatile u8 hang = 1;
 
         cli_init_context(cli_context);
 
+        cli_register_args(cli_context, argv, (const s32)argc);
+
         prime_context(cli_context);
 
-        cli_parse_args(cli_context, argc, argv);
+        cli_parse_init(cli_context, rc);
+        if(0 != *rc) {
+                write(STDERR, (u8*)"Error: Failed to parse initial arguments.\n", 43);
+                return 1;
+        }
 
-        (void) env;
+        cli_parse_callback(cli_context, rc);
+        if(0 != *rc) {
+                write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44);
+                return 1;
+        }
+
+        cli_execute_callback(cli_context, rc);
+        if(0 != *rc) {
+                write(STDERR, (u8*)"Error: Failed to execute callback.\n", 36);
+                return 1;
+        }
+
+        write(STDOUT, (u8*)"Success: Callback executed successfully.\n", 42);
+
+        (void) env; (void) argc; (void) argv;
+
+        while(hang);
 
         return 0;
 }

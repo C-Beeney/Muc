@@ -19,11 +19,11 @@
 #include <ustring.h>
 #include <uassert.h>
 
-imax
+smax
 strlen(
         const u8 *buffer
 ) {
-        imax len = -1;
+        smax len = -1;
         assert(buffer);
         while(buffer[++len]);
         return len;
@@ -52,12 +52,12 @@ streq(
 
 u8*
 itoa(
-    imax i  ,
+    smax i  ,
     u8  *arr
 ) {
-    imax idx = 0;
-    imax start = 0;
-    imax end;
+    smax idx = 0;
+    smax start = 0;
+    smax end;
     u8 *base = arr;
 
     umax u;

@@ -19,10 +19,12 @@
 #include <stypes.h>
 
 #define CLI_COLLECTION_COUNT 2
-#define CLI_COLLECTION_MAX_CHILDREN 5
 #define CLI_TOGGLE_COUNT 1
-#define CLI_GENERIC_TYPE_IDENTIFIERS resource_string
-#define CLI_GENERIC_VALUE_TYPES u8* string;
-#define CLI_RESOURCE_COUNT 1
 #define CLI_ACTION_COUNT 1
-#define CLI_MAX_ACTIONS 1
+#define CLI_MACRO_COUNT 1
+#define CLI_ALIAS_COUNT 1
+
+#define CLI_RESOURCE_IDENTS resource_string
+#define CLI_RESOURCE_TYPES u8* string;
+#define CLI_RESOURCE_COUNT 1
+

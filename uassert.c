@@ -24,7 +24,7 @@ void
 __assert_fail(
     const u8 *expr,
     const u8 *file,
-    const i32 line,
+    const s32 line,
     const u8 *func
 ) {
 
@@ -38,7 +38,7 @@ __assert_fail(
     write(STDERR, (const u8*) " -> ", 4);
     write(STDERR, (const u8*) func, strlen((const u8*)func));
     write(STDERR, (const u8*) " at line ", 10);
-    itoa((imax) line, line_buf);
+    itoa((smax) line, line_buf);
     write(STDERR, (const u8*) line_buf, strlen(line_buf));
     write(STDERR, (const u8*) "\n", 1);
 

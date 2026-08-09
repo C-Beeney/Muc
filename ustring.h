@@ -20,7 +20,7 @@
 #define USTRING_H
 #include <stypes.h>
 
-imax strlen(const u8 *buffer);
+smax strlen(const u8 *buffer);
 u8 streq(const u8 *buffer0, const u8 *buffer1);
-u8* itoa(imax i, u8 *buffer);
+u8* itoa(smax i, u8 *buffer);
 #endif/*USTRING_H*/
