@@ -22,18 +22,20 @@
 void muc_test(const struct CliCallbackContext *ctx, u8 *rc)
 {
         struct CliCollectionIterator it;
-        u8 *buf;
-        
+        const u8 *buf;
+        enum status status[1];
+
         cli_collection_begin(&it, ctx, (u8*) "with");
 
         while((buf = cli_collection_next(&it))) {
-                write(STDOUT, (u8*)"Received value: ", 16);
-                write(STDOUT, buf, strlen(buf));
-                write(STDOUT, (u8*)"\n", 1);
+                write(STDOUT, (u8*)"Received value: ", 16, status);
+                write(STDOUT, buf, strlen(buf), status);
+                write(STDOUT, (u8*)"\n", 1, status);
         }
 
         cli_collection_reset(&it);
 
-        assert(5==write(STDOUT, (u8*)"abcd\n", 5)&&"Please work :)");
+        write(STDOUT, (u8*)"abcd\n", 5, status);
+        assert(*status==OK);
         CLI_ACTION_SET_EXIT_CODE(0);
 }

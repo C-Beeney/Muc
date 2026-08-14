@@ -21,7 +21,6 @@
 #include <ssys.h>
 #include <stypes.h>
 #include <ustring.h>
-#include <umem.h>
 
 void
 cli_init_context(
@@ -279,6 +278,7 @@ cli_parse_collection(
         u8 index, start;
         const u8 *tag;
         struct CliCollection *this;
+        enum status status[1];
 
         *rc = 0;
 
@@ -323,6 +323,8 @@ cli_parse_collection(
 found:
         this = context->collection + index;
 
+        write(STDOUT, this->name, strlen(this->name), status);
+        write(STDOUT, tag+2, strlen(tag+2), status);
         assert(streq(this->name, tag+2));
 
         ++arg->index; /* Consume name of collection. */
@@ -364,6 +366,7 @@ cli_parse_toggle(
         u8                        rc[1]
 ) {
         u8 index;
+        enum status status[1];
 
         assert(context);
 
@@ -389,7 +392,7 @@ cli_parse_toggle(
                 return;
         }
 
-        write(STDOUT, (u8*)"TAST\n", 5);
+        write(STDOUT, (u8*)"TAST\n", 5, status);
         index = context->counter->toggle;
         context->toggle[index].name = arg->args[arg->index];
         context->toggle[index].value = 1;
@@ -447,10 +450,11 @@ cli_print_collection(
         const struct CliArgData arg_data[1]
 ){
         u16 s, o;
+        enum status status[1];
 
-        write(STDOUT, (u8*)"\n\t", 2);
-        write(STDOUT, collection->name, strlen(collection->name));
-        write(STDOUT, (u8*)":\n", 2);
+        write(STDOUT, (u8*)"\n\t", 2, status);
+        write(STDOUT, collection->name, strlen(collection->name), status);
+        write(STDOUT, (u8*)":\n", 2, status);
 
 
         for(    s = 0;
@@ -463,9 +467,9 @@ cli_print_collection(
                         ++o
                 ) {
                         const u8 *buf = arg_data->args[s_offs+o];
-                        write(STDOUT, (u8*)"\t\t", 2);
-                        write(STDOUT, buf, strlen(buf));
-                        write(STDOUT, (u8*)"\n", 1);
+                        write(STDOUT, (u8*)"\t\t", 2, status);
+                        write(STDOUT, buf, strlen(buf), status);
+                        write(STDOUT, (u8*)"\n", 1, status);
                 }
         }
 
@@ -478,36 +482,38 @@ cli_print_collections(
         const struct CliArgData     arg_data[1]
 ) {
         u16 i = 0;
+        enum status status[1];
         {       u8 buffer[32];
-                write(STDOUT, (u8*)"Collections parsed: ", 20);
+                write(STDOUT, (u8*)"Collections parsed: ", 20, status);
                 assert(collection_count < SMAX_MAX);
                 itoa((smax)collection_count, buffer);
-                write(STDOUT, buffer, strlen(buffer));
-                write(STDOUT, (u8*)"\n", 1);
+                write(STDOUT, buffer, strlen(buffer), status);
+                write(STDOUT, (u8*)"\n", 1, status);
         }
         
 
-        write(STDOUT, (u8*)"Collections:", 13);
+        write(STDOUT, (u8*)"Collections:", 13, status);
         for(    i=0;
                 i < collection_count;
                 ++i
         ) {
                 cli_print_collection(collections + i, arg_data);
         }
-        write(STDOUT, (u8*)"\n", 1);
+        write(STDOUT, (u8*)"\n", 1, status);
 }
 
 static void
 cli_print_toggle(
         const struct CliToggle toggle[1]
 ) {
-        write(STDOUT, (u8*)"\t", 1);
-        write(STDOUT, toggle->name, strlen(toggle->name));
-        write(STDOUT, (u8*)": ", 2);
+        enum status status[1];
+        write(STDOUT, (u8*)"\t", 1, status);
+        write(STDOUT, toggle->name, strlen(toggle->name), status);
+        write(STDOUT, (u8*)": ", 2, status);
         if(toggle->value) {
-                write(STDOUT, (u8*)"true\n", 6);
+                write(STDOUT, (u8*)"true\n", 6, status);
         } else {
-                write(STDOUT, (u8*)"false\n", 7);
+                write(STDOUT, (u8*)"false\n", 7, status);
         }
 }
 
@@ -517,14 +523,15 @@ cli_print_toggles(
         const umax              toggle_count
 ) {
         u16 i = 0;
-        write(STDOUT, (u8*)"Toggles:\n", 9);
+        enum status status[1];
+        write(STDOUT, (u8*)"Toggles:\n", 9, status);
         for(    i=0;
                 i < toggle_count;
                 ++i
         ) {
                 cli_print_toggle(toggles + i);
         }
-        write(STDOUT, (u8*)"\n", 1);
+        write(STDOUT, (u8*)"\n", 1, status);
 }
 
 void
@@ -532,6 +539,7 @@ cli_parse_init(
         struct CliContext context[1],
         u8                rc     [1]
 ) {
+        enum status status[1];
         assert(context);
         assert(rc);
 
@@ -542,10 +550,11 @@ cli_parse_init(
                 rc
         );
         if(!*rc) {
-                write(STDOUT, (u8*) "INFO: Parsed ownable state\n", 27);
+                write(STDOUT, (u8*) "INFO: Parsed ownable state\n", 27,
+                        status);
         } else {
                 write(STDERR, (u8*) "ERROR: Failed to parse ownable state\n",
-                        37);
+                        37, status);
         }
 
         cli_print_collections(context->common_context->collection, context->common_context->counter->collection, context->args);
@@ -646,6 +655,6 @@ void
 cli_collection_reset(
         struct CliCollectionIterator it[1]
 ) {
-        
+        (void)it;
 }
 

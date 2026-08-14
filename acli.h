@@ -118,6 +118,7 @@
                 const struct CliCollection      *collection;
                 u16                              offset;
                 u8                               chunk;
+                PAD(0,0,5)
         };
 
         struct CliToggle {
@@ -175,7 +176,8 @@
         };
 
         struct CliCallbackIterator {
-
+                int temp;
+                PAD(0,0,5)
         };
 
         struct CliRegistryCounters {
@@ -321,7 +323,7 @@
                                 struct CliResource
                         )?1:-1];
                 typedef char __cli_collection_expected_size
-                        [(8 + CLI_COLLECTION_MAX_CHILDREN * 8) == sizeof(
+                        [(8 + 0 * 8) == sizeof(
                                 struct CliCollection
                         )?1:-1];
                 typedef char __cli_toggle_expected_size

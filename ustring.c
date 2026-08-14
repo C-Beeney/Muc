@@ -19,7 +19,7 @@
 #include <ustring.h>
 #include <uassert.h>
 
-smax
+umax
 strlen(
         const u8 *buffer
 ) {

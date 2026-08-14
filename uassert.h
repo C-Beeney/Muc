@@ -16,6 +16,7 @@
 |                                                                            |
 |---------------------------------------------------------------------------*/
 
+#ifndef SCOMPAT_H
 #ifndef UASSERT_H
     #define UASSERT_H
     #include <stypes.h>
@@ -25,10 +26,13 @@
     #ifdef NDEBUG
         #define assert(expr) ((void)0)
     #else
-        # define assert(expr) \
+        #define assert(expr) \
             ((expr) ? (void)0 : __assert_fail((const u8*)#expr    , \
                                               (const u8*)__FILE__ , \
                                               (const s32)__LINE__ , \
                                               (const u8*) __func__))
     #endif
 #endif/*UASSERT_H*/
+#else
+    extern void gx__assert_fail(const u8*, const u8*, const s32, const u8*);
+#endif/*SCOMPAT_H*/

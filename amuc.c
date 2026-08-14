@@ -43,6 +43,7 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
         u8 rc[1] = {0};
         struct CliContext cli_context[1];
         const volatile u8 hang = 1;
+        enum status status[1];
 
         cli_init_context(cli_context);
 
@@ -52,23 +53,23 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
 
         cli_parse_init(cli_context, rc);
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to parse initial arguments.\n", 43);
+                write(STDERR, (u8*)"Error: Failed to parse initial arguments.\n", 43, status);
                 return 1;
         }
 
         cli_parse_callback(cli_context, rc);
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44);
+                write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44, status);
                 return 1;
         }
 
         cli_execute_callback(cli_context, rc);
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to execute callback.\n", 36);
+                write(STDERR, (u8*)"Error: Failed to execute callback.\n", 36, status);
                 return 1;
         }
 
-        write(STDOUT, (u8*)"Success: Callback executed successfully.\n", 42);
+        write(STDOUT, (u8*)"Success: Callback executed successfully.\n", 42, status);
 
         (void) env; (void) argc; (void) argv;
 
