@@ -51,18 +51,21 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
 
         prime_context(cli_context);
 
+        write(STDOUT, (u8*)"Parsing initial arguments...\n", 29, status);
         cli_parse_init(cli_context, rc);
         if(0 != *rc) {
                 write(STDERR, (u8*)"Error: Failed to parse initial arguments.\n", 43, status);
                 return 1;
         }
 
+        write(STDOUT, (u8*)"Parsing callback arguments...\n", 30, status);
         cli_parse_callback(cli_context, rc);
         if(0 != *rc) {
                 write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44, status);
                 return 1;
         }
 
+        write(STDOUT, (u8*)"Executing callbacks...\n", 23, status);
         cli_execute_callback(cli_context, rc);
         if(0 != *rc) {
                 write(STDERR, (u8*)"Error: Failed to execute callback.\n", 36, status);

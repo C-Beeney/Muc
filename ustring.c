@@ -19,11 +19,12 @@
 #include <ustring.h>
 #include <uassert.h>
 
+/* TODO: Remove all UB for future MISRA compliance */
 umax
 strlen(
         const u8 *buffer
 ) {
-        smax len = -1;
+        umax len = UMAX_MAX;
         assert(buffer);
         while(buffer[++len]);
         return len;

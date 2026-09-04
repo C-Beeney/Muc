@@ -274,17 +274,52 @@ gx_streq(
 
 u8*
 gx_itoa(
-    smax i,
-    u8 *buffer
+    smax i  ,
+    u8  *arr
 ) {
-    assert(i<=INT_MAX);
-    assert(i>=INT_MIN);
-    sprintf((char *)buffer, "%d", i);
-    return buffer;
+    smax idx = 0;
+    smax start = 0;
+    smax end;
+    u8 *base = arr;
+
+    umax u;
+    if (i < 0) {
+        *arr++ = '-';
+        u = (umax)(-(umax)i);
+    } else {
+        u = (umax)i;
+    }
+
+    if (u == 0) {
+        arr[idx++] = '0';
+        arr[idx] = 0;
+        return base;
+    }
+
+    while (u > 0) {
+        arr[idx++] = (u8)('0' + (u % 10));
+        u /= 10;
+    }
+
+    arr[idx] = 0;
+
+    end = idx - 1;
+
+    while (start < end) {
+        u8 tmp = arr[start];
+        arr[start] = arr[end];
+        arr[end] = tmp;
+        start++;
+        end--;
+    }
+
+    return base;
 }
+
 
 extern s8 gx_main(const s32 argc, const u8 *argv[], const u8 *env[]);
 
+#undef main
 int main(int argc, char **argv) {
     extern char **environ;
     return gx_main(argc, (const u8 **)argv, (const u8 **)environ);

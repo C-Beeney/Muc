@@ -176,8 +176,8 @@
         };
 
         struct CliCallbackIterator {
-                int temp;
-                PAD(0,0,5)
+                s32 temp;
+                PAD(0,0,4)
         };
 
         struct CliRegistryCounters {
@@ -221,7 +221,7 @@
         cli_register_verify(
                 const struct CliContext context[1]
         );
-
+\
         void
         cli_register_toggle(
                 struct CliContext context[1],
@@ -312,61 +312,57 @@
 
         /* void cli_execute(); not yet */
 
-
         #if !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_64)
                 typedef char __cli_generic_expected_size
-                        [16  == sizeof(
-                                struct CliResourceBinding
+                        [16  == sizeof(struct CliResourceBinding
                         )?1:-1];
                 typedef char __cli_resource_expected_size
-                        [(8 + sizeof(struct CliResourceBinding)) == sizeof(
-                                struct CliResource
+                        [24 == sizeof(struct CliResource
                         )?1:-1];
                 typedef char __cli_collection_expected_size
-                        [(8 + 0 * 8) == sizeof(
-                                struct CliCollection
+                        [16 == sizeof(struct CliCollection
+                        )?1:-1];
+                typedef char __cli_collection_iterator_expected_size
+                        [24 == sizeof(struct CliCollectionIterator
                         )?1:-1];
                 typedef char __cli_toggle_expected_size
-                        [16 == sizeof(
-                                struct CliToggle
+                        [16 == sizeof(struct CliToggle
+                        )?1:-1];
+                typedef char __cli_ownable_context_counters_expected_size
+                        [8 == sizeof(struct CliOwnableContextCounters
+                        )?1:-1];
+                typedef char __cli_ownable_context_expected_size
+                        [56 == sizeof(struct CliOwnableContext
                         )?1:-1];
                 typedef char __cli_callback_context_expected_size
-                        [(      sizeof(struct CliCollection)*
-                                        CLI_COLLECTION_COUNT +
-                                sizeof(struct CliToggle)*CLI_TOGGLE_COUNT +
-                                sizeof(struct CliResource)*CLI_RESOURCE_COUNT)
-                                 == sizeof(struct CliCallbackContext
+                        [72 == sizeof(struct CliCallbackContext
                         )?1:-1];
                 typedef char __cli_action_expected_size
-                        [(8+sizeof(CliCallbackFunction)) == sizeof(
-                                struct CliAction
+                        [16 == sizeof(struct CliAction
                         )?1:-1];
-                typedef char __cli_contextualised_callback_expected_size
-                        [(      sizeof(struct CliCallbackContext) +
-                                sizeof(CliCallbackFunction))
-                                 == sizeof( struct CliCallback
+                typedef char __cli_macro_expected_size
+                        [16 == sizeof(struct CliMacro
+                        )?1:-1];
+                typedef char __cli_alias_expected_size
+                        [16 == sizeof(struct CliAlias
+                        )?1:-1];
+                typedef char __cli_callback_expected_size
+                        [80 == sizeof(struct CliCallback
+                        )?1:-1];
+                typedef char __cli_callback_iterator_expected_size
+                        [8 == sizeof(struct CliCallbackIterator
                         )?1:-1];
                 typedef char __cli_registry_counters_expected_size
-                        [16 == sizeof(
-                                struct CliRegistryCounters
+                        [8 ==sizeof(struct CliRegistryCounters
                         )?1:-1];
                 typedef char __cli_registry_expected_size
-                        [(
-                                sizeof(struct CliAction)
-                                        * CLI_ACTION_COUNT +
-                                sizeof(struct CliCollection)
-                                        * CLI_COLLECTION_COUNT +
-                                sizeof(struct CliToggle)
-                                        * CLI_TOGGLE_COUNT +
-                                sizeof(struct CliResource)
-                                        * CLI_RESOURCE_COUNT +
-                                sizeof(struct CliRegistryCounters)
-                        ) == sizeof(
-                                struct CliRegistry
+                        [128 == sizeof(struct CliRegistry
+                        )?1:-1];
+                typedef char __cli_arg_data_expected_size
+                        [16 == sizeof(struct CliArgData
                         )?1:-1];
                 typedef char __cli_context_expected_size
-                        [sizeof(
-                                struct CliContext
+                        [200 == sizeof(struct CliContext
                         )?1:-1];
 
         #elif !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_32)

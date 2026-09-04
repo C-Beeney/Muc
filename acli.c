@@ -32,6 +32,9 @@ cli_init_context(
         context->registry->counter->action     = U8_MAX;
         context->registry->counter->resource   = U8_MAX;
 
+        context->common_context->counter->toggle     = 0;
+        context->common_context->counter->collection = 0;
+
                 /* No other values require initialisation */
 }
 
@@ -188,13 +191,15 @@ cli_verify_action_tag(
         umax action_index_max = registry->counter->action;
         umax index;
 
+        assert(name[0] == '-' && name[1] == '-');
+
         *rc = 0;
 
         for(    index = 0;
                 index <= action_index_max;
                 ++index
         ) {
-                *rc = streq(actions[index].name, name);
+                *rc = streq(actions[index].name, name + 2);
                 if (*rc) { return; }
         }
 }
@@ -209,15 +214,15 @@ cli_verify_collection_tag(
         umax collection_index_max = registry->counter->collection;
         umax index;
 
+        assert(name[0] == '-' && name[1] == '-');
+
         *rc = 0;
 
         for (   index = 0;
                 index <= collection_index_max;
                 ++index
         ) {
-                *rc = streq(collections[index].name, name + 2) &&
-                        name[0] == '-' &&
-                        name[1] == '-';
+                *rc = streq(collections[index].name, name + 2);
                 if (*rc) { return; }
         }
 }
@@ -231,6 +236,8 @@ cli_verify_toggle_tag(
         const struct CliToggle *toggles = registry->toggle;
         umax toggle_index_max = registry->counter->toggle;
         umax index;
+
+        assert(name[0] == '-' && name[1] == '-');
 
         *rc = 0;
 
@@ -278,7 +285,6 @@ cli_parse_collection(
         u8 index, start;
         const u8 *tag;
         struct CliCollection *this;
-        enum status status[1];
 
         *rc = 0;
 
@@ -322,9 +328,6 @@ cli_parse_collection(
 
 found:
         this = context->collection + index;
-
-        write(STDOUT, this->name, strlen(this->name), status);
-        write(STDOUT, tag+2, strlen(tag+2), status);
         assert(streq(this->name, tag+2));
 
         ++arg->index; /* Consume name of collection. */
@@ -369,6 +372,8 @@ cli_parse_toggle(
         enum status status[1];
 
         assert(context);
+        assert(context->counter->toggle < CLI_TOGGLE_COUNT);
+        assert(context->toggle);
 
         *rc = 0;
 
@@ -376,6 +381,10 @@ cli_parse_toggle(
                 index < context->counter->toggle;
                 ++index
         ) {
+                assert(index < CLI_TOGGLE_COUNT);
+                assert(context->toggle[index].name);
+                assert(arg->index < arg->count);
+                assert(arg->args[arg->index]);
                 if(streq(context->toggle[index].name, arg->args[arg->index])
                 ) {
                         context->toggle[index].value=1;
@@ -441,6 +450,10 @@ cli_parse_ownable_state(
                 }
 
                 cli_verify_action_tag(registry, args[*index], rc);
+                if(*rc) {
+                        *rc = 0;
+                        break;
+                }
                 ++(*index);
         }
 }

@@ -16,32 +16,18 @@
 #                                                                            |
 #---------------------------------------------------------------------------*/
 
+set -xe
+
+# This script is for POSIX platforms.
+
 mkdir temp && cd temp
 
-clang -c \
-    -x c ../a*.c ../m*.c \
-    -I.. -imacros ../scompat.h \
-    -Weverything -Wno-reserved-identifier -Wno-empty-translation-unit \
-    -Wno-unsafe-buffer-usage -Wno-c++-keyword -Wno-c2y-extensions \
-    -fpie \
-    -DNO_COMPILER_EXTENSIONS \
-    -Werror --target=x86_64-pc-linux \
-    -ansi \
-    $@
+cc -c -x c ../a*.c ../m*.c -I.. -imacros ../scompat.h
 
 cd -
 
-clang -c \
-    sposix.c -o temp/sposix.o -I. \
-    -Weverything -Wno-reserved-identifier -Wno-empty-translation-unit \
-    -Wno-unsafe-buffer-usage -Wno-c++-keyword -Wno-c2y-extensions -Wno-cast-qual \
-    -fpie -Wno-cast-function-type-strict -Wno-incompatible-function-pointer-types-strict -Wno-incompatible-function-pointer-types \
-    -DNO_COMPILER_EXTENSIONS \
-    -Werror --target=x86_64-pc-linux -Wno-missing-noreturn \
-    -ansi
+cc -c sposix.c -o temp/sposix.o -I. -Wno-incompatible-pointer-types
 
-clang temp/*.o -o out.elf -fpie -static
+cc temp/*.o -o out.elf
 
 rm -fr temp/
-
-strip out.elf

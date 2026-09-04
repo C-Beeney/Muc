@@ -4,32 +4,38 @@ ENTRY(_start)
 
 PHDRS
 {
-    load  PT_LOAD FILEHDR PHDRS FLAGS(5); /* PF_R | PF_X */
-    stack PT_GNU_STACK       FLAGS(6);    /* PF_R | PF_W */
+    text_hdr PT_LOAD FILEHDR PHDRS FLAGS(5); /* 5 = PF_R | PF_X (Read + Execute) */
+    data_hdr PT_LOAD               FLAGS(6); /* 6 = PF_R | PF_W (Read + Write) */
 }
 
 SECTIONS
 {
-    /*
-     * Keep the ELF and program headers mapped at 0x200000, then place
-     * code and constants immediately after them in the same PT_LOAD.
-     */
+    /* PAGE 1: Read-Execute (Code & Constants) */
     . = 0x200000 + SIZEOF_HEADERS;
 
     .text :
     {
         *(.text)
         *(.text.*)
-
         *(.rodata)
         *(.rodata.*)
-    } :load
+    } :text_hdr
+
+    /* FORCE ALIGNMENT TO NEXT 4K PAGE BOUNDARY */
+    . = ALIGN(0x1000);
+
+    /* PAGE 2: Read-Write (Variables & Context) */
+    .data :
+    {
+        *(.data)
+        *(.data.*)
+        *(.bss)
+        *(.bss.*)
+    } :data_hdr
 
     /DISCARD/ :
     {
         *(.comment)
         *(.note*)
-        *(.eh_frame*)
-        *(.eh_frame_hdr*)
     }
 }

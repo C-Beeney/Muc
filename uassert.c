@@ -29,18 +29,19 @@ __assert_fail(
 ) {
 
     u8 line_buf[64];
+    enum status status[1];
 
-    write(STDERR, (const u8*) "Assertion failed: ", 19          );
-    write(STDERR, (const u8*) expr                , strlen((const u8*)expr));
-    write(STDERR, (const u8*) "\n"                , 1);
+    write(STDERR, (const u8*) "Assertion failed: ", 19, status);
+    write(STDERR, (const u8*) expr, strlen((const u8*)expr), status);
+    write(STDERR, (const u8*) "\n", 1, status);
 
-    write(STDERR, (const u8*) file, strlen((const u8*)file));
-    write(STDERR, (const u8*) " -> ", 4);
-    write(STDERR, (const u8*) func, strlen((const u8*)func));
-    write(STDERR, (const u8*) " at line ", 10);
+    write(STDERR, (const u8*) file, strlen((const u8*)file), status);
+    write(STDERR, (const u8*) " -> ", 4, status);
+    write(STDERR, (const u8*) func, strlen((const u8*)func), status);
+    write(STDERR, (const u8*) " at line ", 10, status);
     itoa((smax) line, line_buf);
-    write(STDERR, (const u8*) line_buf, strlen(line_buf));
-    write(STDERR, (const u8*) "\n", 1);
+    write(STDERR, (const u8*) line_buf, strlen(line_buf), status);
+    write(STDERR, (const u8*) "\n", 1, status);
 
     abort();
 }
