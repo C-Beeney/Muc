@@ -29,10 +29,11 @@
 
                 #define ARCH_64
 
-        #elif   defined(__i386__) || \
-                defined(__i386)   || \
-                defined(_M_IX86)  || \
-                defined(__arm__)  || \
+        #elif   defined(__i386__)    || \
+                defined(__i386)      || \
+                defined(_M_IX86)     || \
+                defined(__arm__)     || \
+		defined(__powerpc__) || \
                 (defined(_WIN32) && !defined(_WIN64))
 
                 #define ARCH_32
