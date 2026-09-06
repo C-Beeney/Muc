@@ -367,9 +367,6 @@
                 typedef char __cli_context_expected_size
                         [200 == sizeof(struct CliContext
                         )?1:-1];
-
-        #elif !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_32)
-                        typedef char no_expected_sizes[-1];
         #elif !defined(NO_CLI_STRUCT_SIZE_ASSERTS) && defined(ARCH_16)
                         typedef char no_expected_sizes[-1];
         #endif/*Size checks*/
