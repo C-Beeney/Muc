@@ -44,6 +44,7 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
         struct CliContext cli_context[1];
         const volatile u8 hang = 1;
         enum status status[1];
+        struct CliCallback callback;
 
         cli_init_context(cli_context);
 
@@ -59,7 +60,7 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
         }
 
         write(STDOUT, (u8*)"Parsing callback arguments...\n", 30, status);
-        cli_parse_callback(cli_context, rc);
+        cli_parse_callback(cli_context, &callback, rc);
         if(0 != *rc) {
                 write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44, status);
                 return 1;

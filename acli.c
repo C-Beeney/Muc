@@ -574,13 +574,59 @@ cli_parse_init(
         cli_print_toggles(context->common_context->toggle, context->common_context->counter->toggle);
 }
 
+/* TODO: This entire function. */
 void
 cli_parse_callback(
-        struct CliContext context[1],
-        u8                rc     [1]
+        struct CliContext  context [1],
+        struct CliCallback callback[1],
+        u8                 rc      [1]
 ) {
-        /* TODO TOMORROW! */
-        (void) context; (void) rc;
+        enum status status[1];
+        umax idx;
+        const u8 *arg;
+
+        assert(context);
+        assert(callback);
+        assert(rc);
+
+        arg = context->args->args[context->args->index];
+        ++context->args->index;
+        *rc = 0;
+
+        assert(context->registry->counter->action == CLI_ACTION_COUNT-1);
+
+        for(idx = 0; idx < CLI_ACTION_COUNT; ++idx) {
+                assert(arg[0] == '-' && arg[1] == '-');
+
+                write(STDOUT, arg +2, strlen(arg + 2), status);
+                write(STDOUT, "\n", 1, status);
+                write(STDOUT, context->registry->action[idx].name, strlen(context->registry->action[idx].name), status);
+                write(STDOUT, "\n", 1, status);
+
+                if(streq(arg+2, context->registry->action[idx].name)) {
+                        goto found;
+                }
+        }
+
+        *rc = 1;
+        return;
+
+found:
+
+        callback->callback = context->registry->action->callback;
+        write(STDOUT, (u8*) "Parsing ownable state again:\n", 29, status);
+        cli_parse_ownable_state(
+                context->registry,
+                callback->context->owned,
+                context->args,
+                rc
+        );
+        write(STDOUT, (u8*)"All done...\n", 13, status);
+
+        callback->context->arg = context->args;
+        callback->context->resource = context->registry->resource;
+
+        *rc = 0;
 }
 
 void

@@ -37,5 +37,5 @@ void muc_test(const struct CliCallbackContext *ctx, u8 *rc)
 
         write(STDOUT, (u8*)"abcd\n", 5, status);
         assert(*status==OK);
-        CLI_ACTION_SET_EXIT_CODE(0);
+        CLI_ACTION_SET_EXIT_CODE(OK);
 }

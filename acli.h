@@ -141,9 +141,9 @@
         };
 
         struct CliCallbackContext {
-                struct CliOwnableContext   owned[1];
-                const struct CliResource **resource;
-                const struct CliArgData   *arg;
+                struct CliOwnableContext  owned[1];
+                const struct CliResource *resource;
+                const struct CliArgData  *arg;
         };
 
         typedef void (*CliCallbackFunction)(
@@ -278,8 +278,9 @@
         
         void
         cli_parse_callback(
-                struct CliContext context[1],
-                u8                rc     [1]
+                struct CliContext  context [1],
+                struct CliCallback callback[1],
+                u8                 rc      [1]
         );
 
         void
@@ -309,6 +310,8 @@
         cli_collection_reset(
                 struct CliCollectionIterator *it
         );
+
+        
 
         /* void cli_execute(); not yet */
 
