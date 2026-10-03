@@ -25,6 +25,6 @@
 #define CLI_ALIAS_COUNT 1
 
 #define CLI_RESOURCE_IDENTS resource_string
-#define CLI_RESOURCE_TYPES u8* string;
+#define CLI_RESOURCE_TYPES const u8* string;
 #define CLI_RESOURCE_COUNT 1
 

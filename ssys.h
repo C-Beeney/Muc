@@ -19,160 +19,87 @@
 #ifndef SSYS_H
 #define SSYS_H
 
-        
-        enum status {
-            #ifndef SCOMPAT_IMPL
-            OK = 0,
+        #define SSYS_CAT_(a, b) a##b
+        #define SSYS_CAT(a, b)  SSYS_CAT_(a, b)
 
-            GENERIC_ERR,
-            EOF,
-            STATUS_COUNT
-            #else
-            GX_OK = 0,
-            GX_GENERIC_ERR,
-            GX_EOF,
-            GX_STATUS_COUNT
-            #endif/*SCOMPAT_H*/
+        #ifndef SSYS_PREFIX
+                #define SSYS_PREFIXED(s) s
+        #else/*SSYS_PREFIX*/
+                #define SSYS_PREFIXED(s) SSYS_CAT(SSYS_PREFIX, s)
+        #endif/*SSYS_PREFIX*/
+
+        enum status {
+            SSYS_PREFIXED(OK                  ) = 0,
+            SSYS_PREFIXED(GENERIC_ERR         )    ,
+            SSYS_PREFIXED(EOF                 )    ,
+            SSYS_PREFIXED(COLLECTION_NOT_FOUND)    ,
+            SSYS_PREFIXED(STATUS_COUNT)
         };
 
+        #include <stypes.h>
 
         #ifndef SSYS_H_NODECL
-                #include <stypes.h>
-
                 #define STDIN       ((const u32)0)
                 #define STDOUT      ((const u32)1)
                 #define STDERR      ((const u32)2)
+        #endif
+        
+        extern void
+        SSYS_PREFIXED(read)(
+                const u16 fh,
+                u8* buffer,
+                const umax count,
+                enum status status[1]
+        );
 
-                extern void
-                read(
-                        const u16 fh,
-                        u8* buffer,
-                        const umax count,
-                        enum status status[1]
-                );
+        extern void
+        SSYS_PREFIXED(write)(
+                const u16 fh,
+                const u8 *buffer,
+                const umax count,
+                enum status status[1]
+        );
 
-                extern void
-                write(
-                        const u16 fh,
-                        const u8 *buffer,
-                        const umax count,
-                        enum status status[1]
-                );
+        extern u16
+        SSYS_PREFIXED(open)(
+                const u8 *path,
+                enum status status[1]
+        );
 
-                extern u16
-                open(
-                        const u8 *path,
-                        enum status status[1]
-                );
+        extern u16
+        SSYS_PREFIXED(open_readonly)(
+                const u8 *path,
+                enum status status[1]
+        );
 
-                extern u16
-                open_readonly(
-                        const u8 *path,
-                        enum status status[1]
-                );
+        extern u16
+        SSYS_PREFIXED(create)(
+                const u8 *path,
+                enum status status[1]
+        );
 
-                extern u16
-                create(
-                        const u8 *path,
-                        enum status status[1]
-                );
+        extern void
+        SSYS_PREFIXED(create_passive)(
+                const u8 *path,
+                enum status status[1]
+        );
 
-                extern void
-                create_passive(
-                        const u8 *path,
-                        enum status status[1]
-                );
+        extern void
+        SSYS_PREFIXED(close)(
+                const u16 fh,
+                enum status status[1]
+        );
 
-                extern void
-                close(
-                        const u16 fh,
-                        enum status status[1]
-                );
+        extern void
+        SSYS_PREFIXED(exit)(
+                const s8 ec
+        );
 
-                extern void
-                exit(
-                    const s8 ec
-                );
+        extern void
+        SSYS_PREFIXED(abort)(void);
 
-                extern void
-                abort(void);
-        #else
-                extern void
-                gx_read(
-                        const u16 fh,
-                        u8* buffer,
-                        const umax count,
-                        enum status status[1]
-                );
+        #undef SSYS_CAT_
+        #undef SSYS_CAT
+        #undef SSYS_PREFIXED
 
-                extern void
-                gx_write(
-                        const u16 fh,
-                        const u8 *buffer,
-                        const umax count,
-                        enum status status[1]
-                );
-
-                extern u16
-                gx_open(
-                        const u8 *path,
-                        enum status status[1]
-                );
-
-                extern u16
-                gx_open_readonly(
-                        const u8 *path,
-                        enum status status[1]
-                );
-
-                extern u16
-                gx_create(
-                        const u8 *path,
-                        enum status status[1]
-                );
-
-                extern void
-                gx_create_passive(
-                        const u8 *path,
-                        enum status status[1]
-                );
-
-                extern void
-                gx_close(
-                        const u16 fh,
-                        enum status status[1]
-                );
-
-                extern void
-                gx_exit(
-                    const s8 ec
-                );
-
-                extern u8*
-                gx_itoa(
-                    smax i,
-                    u8 *buffer
-                );
-
-                int gx__assert_fail(
-                    const u8 *expr,
-                    const u8 *file,
-                    const s32 line,
-                    const u8 *func
-                );
-
-                smax
-                gx_strlen(
-                        const u8 *buffer
-                );
-
-                u8
-                gx_streq(
-                        const u8 *buffer0,
-                        const u8 *buffer1
-                );
-
-                extern void
-                gx_abort(void);
-        #endif /*SSYS_H_NODECL*/
 #endif/*SSYS_H*/

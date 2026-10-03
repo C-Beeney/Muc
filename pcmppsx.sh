@@ -22,12 +22,12 @@ set -xe
 
 mkdir temp && cd temp
 
-cc -c -x c ../a*.c ../m*.c -I.. -imacros ../scompat.h
+cc -c -x c ../a*.c ../m*.c -I.. -imacros ../scompat.h $@ -Wall -Wextra -pedantic -Wno-empty-translation-unit
 
 cd -
 
-cc -c sposix.c -o temp/sposix.o -I. -Wno-incompatible-pointer-types
+cc -c sposix.c -o temp/sposix.o -I. -Wno-incompatible-pointer-types $@ -Wall -Wextra -pedantic -Wno-empty-translation-unit
 
-cc temp/*.o -o out.elf
+cc temp/*.o -o out.elf $@ -Wall -Wextra -pedantic -Wno-empty-translation-unit
 
 rm -fr temp/

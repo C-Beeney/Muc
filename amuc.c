@@ -22,17 +22,18 @@
 #include <ustring.h>
 #include <acli.h>
 #include <mtest.h>
+#include <uconio.h>
 
 static void prime_context(struct CliContext cli_context[1])
 {
         union CliResourceValue cli_generic_value;
-        cli_generic_value.string = (u8*)"A very alpha version!";
+        cli_generic_value.string = b"A very alpha version!";
 
-        cli_register_collection (cli_context, (u8*)"with");
-        cli_register_collection (cli_context, (u8*)"as");
-        cli_register_toggle     (cli_context, (u8*)"quiet");
-        cli_register_action     (cli_context, (u8*)"test" , muc_test);
-        cli_register_resource   (cli_context, (u8*)"program:version",
+        cli_register_collection (cli_context, b"with");
+        cli_register_collection (cli_context, b"as");
+        cli_register_toggle     (cli_context, b"quiet");
+        cli_register_action     (cli_context, b"test" , muc_test);
+        cli_register_resource   (cli_context, b"program:version",
                 resource_string,
                 cli_generic_value);
         cli_register_verify(cli_context);
@@ -43,7 +44,6 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
         u8 rc[1] = {0};
         struct CliContext cli_context[1];
         const volatile u8 hang = 1;
-        enum status status[1];
         struct CliCallback callback;
 
         cli_init_context(cli_context);
@@ -52,30 +52,39 @@ s8 main(const s32 argc, const u8 *argv[], const u8 *env[])
 
         prime_context(cli_context);
 
-        write(STDOUT, (u8*)"Parsing initial arguments...\n", 29, status);
+        printdbgln(b"Parsing initial arguments...");
         cli_parse_init(cli_context, rc);
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to parse initial arguments.\n", 43, status);
+                printerrln(b"Failed to parse initial arguments.");
                 return 1;
+        } else {
+                printdbgln(b"Parsed initial arguments.");
         }
 
-        write(STDOUT, (u8*)"Parsing callback arguments...\n", 30, status);
+        printdbgln(b"Parsing callback arguments...");
         cli_parse_callback(cli_context, &callback, rc);
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to parse callback arguments.\n", 44, status);
+                printerrln(b"Failed to parse callback arguments.");
                 return 1;
+        } else {
+                printdbgln(b"Parsed callback.");
         }
 
-        write(STDOUT, (u8*)"Executing callbacks...\n", 23, status);
-        cli_execute_callback(cli_context, rc);
+        printdbgln(b"Executing callbacks...");
+        callback.callback(callback.context, rc);
+
+
+        /*cli_execute_callback(cli_context, rc);*/
         if(0 != *rc) {
-                write(STDERR, (u8*)"Error: Failed to execute callback.\n", 36, status);
+                printerrln(b"Failed to execute callback.");
                 return 1;
+        } else {
+                printdbgln(b"Executed callbacks.");
         }
 
-        write(STDOUT, (u8*)"Success: Callback executed successfully.\n", 42, status);
+        printdbgln(b"Callback executed successfully.");
 
-        (void) env; (void) argc; (void) argv;
+        (void) env;
 
         while(hang);
 

@@ -2,6 +2,8 @@
 
 #define SSYS_H_NODECL
 #define SCOMPAT_IMPL
+
+#define SSYS_PREFIX GX_
 #include <ssys.h>
 
 #define _POSIX_C_SOURCE 1
@@ -17,7 +19,7 @@
 #include <assert.h>
 
 #ifndef SPOSIX_DISK_MAX_TRIES
-#define SPOSIX_DISK_MAX_TRIES 15
+#define SPOSIX_DISK_MAX_TRIES 3
 #endif/*SPOSIX_DISK_MAX_TRIES*/
 
 static void
@@ -29,7 +31,7 @@ gx_disk(
         ssize_t(*method)(int,void *,size_t)
 
 ) {
-        ssize_t disk_total = 0;
+        umax disk_total = 0;
         u8 tries = 0;
 
         *status = GX_OK;
@@ -74,7 +76,8 @@ gx_disk(
 
                 tries = 0;
                 assert(disk_total + n <= U32_MAX);
-                disk_total += n;
+                assert(n >= 0);
+                disk_total += (umax) n;
                 assert(disk_total <= count);
         }
 
@@ -103,7 +106,7 @@ gx_write(
 
 /*
     U16_MAX is a valid file handle, but is also returned on error.
-    check status to verify wheather there was an error
+    check status to verify whether there was an error
 */
 static u16
 gx_open_generic_mode(
@@ -231,47 +234,6 @@ gx_abort(
     abort();
 }
 
-int gx__assert_fail(
-    const u8 *expr,
-    const u8 *file,
-    const s32 line,
-    const u8 *func
-) {
-    u8 line_buf[64];
-
-    write(STDERR_FILENO, (const char*) "Assertion failed: ", 19          );
-    write(STDERR_FILENO, (const char*) expr                , strlen((const char*)expr));
-    write(STDERR_FILENO, (const char*) "\n"                , 1);
-
-    write(STDERR_FILENO, (const char*) file, strlen((const char*)file));
-    write(STDERR_FILENO, (const char*) " -> ", 4);
-    write(STDERR_FILENO, (const char*) func, strlen((const char*)func));
-    write(STDERR_FILENO, (const char*) " at line ", 10);
-    gx_itoa((smax) line, line_buf);
-    write(STDERR_FILENO, (const char*) line_buf, strlen((const char*)line_buf));
-    write(STDERR_FILENO, (const char*) "\n", 1);
-
-    abort();
-}
-
-smax
-gx_strlen(
-    const u8 *buffer
-) {
-    size_t len = strlen((const char*)buffer);
-    assert(len < SMAX_MAX);
-    return (smax) len;
-}
-
-u8
-gx_streq(
-    const u8 *buffer0,
-    const u8 *buffer1
-) {
-    int res = strcmp((const char*)buffer0, (const char*)buffer1);
-    return (u8) (0 == res);
-}
-
 u8*
 gx_itoa(
     smax i  ,
@@ -316,6 +278,111 @@ gx_itoa(
     return base;
 }
 
+int gx__assert_fail(
+    const u8 *expr,
+    const u8 *file,
+    const s32 line,
+    const u8 *func
+) {
+    u8 line_buf[64];
+
+    write(STDERR_FILENO, (const char*) "Assertion failed: ", 19          );
+    write(STDERR_FILENO, (const char*) expr                , strlen((const char*)expr));
+    write(STDERR_FILENO, (const char*) "\n"                , 1);
+
+    write(STDERR_FILENO, (const char*) file, strlen((const char*)file));
+    write(STDERR_FILENO, (const char*) " -> ", 4);
+    write(STDERR_FILENO, (const char*) func, strlen((const char*)func));
+    write(STDERR_FILENO, (const char*) " at line ", 10);
+    gx_itoa((smax) line, line_buf);
+    write(STDERR_FILENO, (const char*) line_buf, strlen((const char*)line_buf));
+    write(STDERR_FILENO, (const char*) "\n", 1);
+
+    abort();
+}
+
+smax
+gx_strlen(
+    const u8 *buffer
+) {
+    size_t len = strlen((const char*)buffer);
+    assert(len < SMAX_MAX);
+    return (smax) len;
+}
+
+u8
+gx_streq(
+    const u8 *buffer0,
+    const u8 *buffer1
+) {
+    int res = strcmp((const char*)buffer0, (const char*)buffer1);
+    return (u8) (0 == res);
+}
+
+void
+gx_print(
+        const u8 *buffer
+) {
+        printf("%s", buffer);
+}
+
+void
+gx_println(
+        const u8 *buffer
+) {
+        printf("%s\n", (null != buffer) ? buffer : b"");
+}
+
+void
+gx_printerr(
+        const u8 *buffer
+) {
+        fprintf(stderr, "[ERROR] %s", buffer);
+}
+
+void
+gx_printerrln(
+        const u8 *buffer
+) {
+        fprintf(stderr, "[ERROR] %s\n", buffer);
+}
+
+#ifndef NDEBUG
+#ifndef NDEBUG_CONIO
+void
+gx_printdbg(
+        const u8 *buffer
+) {
+        printf("[DEBUG] %s", buffer);
+}
+
+void
+gx_printdbgln(
+        const u8 *buffer
+) {
+        printf("[DEBUG] %s\n", (null != buffer ? buffer : b""));
+}
+#else
+#define CONIO_PRINTDBG_STUB
+#endif/*NDEBUG_CONIO*/
+#else
+#define CONIO_PRINTDBG_STUB
+#endif/*NDEBUG*/
+#ifdef CONIO_PRINTDBG_STUB
+void
+gx_printdbg(
+        const u8 *buffer
+) {
+        (void)buffer;
+}
+
+void
+gx_printdbgln(
+        const u8 *buffer
+) {
+        (void)buffer;
+}
+#endif/*CONIO_PRINTDBG_STUB*/
 
 extern s8 gx_main(const s32 argc, const u8 *argv[], const u8 *env[]);
 

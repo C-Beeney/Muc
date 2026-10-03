@@ -22,6 +22,7 @@
         #include <stypes.h>
         #include <uassert.h>
         #include <ustring.h>
+        #include <ssys.h>
 
         #ifndef CLI_CONFIG_H
                 #define CLI_CONFIG_H
@@ -103,22 +104,24 @@
                 const u8 *name;
 
                 /* These variables are intended for use with argv's data.
-                 * start signifies the index of the first argv value in the
-                 * collection. Each following start represents just that,
-                 * continue parsing the collection from that point. A segment
-                 * ends when it typically would syntactically. length signifies
-                 * the number of argv values in the collection.
-                 * */
-                u16 start[CLI_COLLECTION_MAX_STARTS]
-                ,   length;
+                * start signifies the index of the first argv value in the
+                * collection. Each following start represents just that,
+                * continue parsing the collection from that point. A segment
+                * ends when it typically would syntactically. length signifies
+                * the number of argv values in the collection.
+                * */
+                u16 start[CLI_COLLECTION_MAX_STARTS];
+                u8 starts;
+                PAD(0,0,8-((2*CLI_COLLECTION_MAX_STARTS+1)%8))
         };
 
         struct CliCollectionIterator {
                 const struct CliCallbackContext *ctx;
                 const struct CliCollection      *collection;
                 u16                              offset;
+                u16                              consumed;
                 u8                               chunk;
-                PAD(0,0,5)
+                PAD(0,0,3)
         };
 
         struct CliToggle {
@@ -271,6 +274,27 @@
         );
 
         void
+        cli_verify_action_tag(
+                const struct CliRegistry registry[1],
+                const u8                 name    [] ,
+                u8                       rc      [1]
+        );
+
+        void
+        cli_verify_collection_tag(
+                const struct CliRegistry registry[1],
+                const u8                 name    [] ,
+                u8                       rc      [1]
+        );
+
+        void
+        cli_verify_toggle_tag(
+                const struct CliRegistry registry[1],
+                const u8                 name    [] ,
+                u8                       rc      [1]
+        );
+
+        void
         cli_parse_init(
                 struct CliContext context[1],
                 u8                rc     [1]
@@ -285,8 +309,8 @@
 
         void
         cli_execute_callback(
-                struct CliContext context[1],
-                u8                rc     [1]
+                struct CliCallback context[1],
+                u8                 rc     [1]
         );
 
         void
@@ -294,7 +318,7 @@
                 struct CliContext context[1]
         );
 
-        struct CliCollectionIterator*
+        enum status
         cli_collection_begin(
                 struct CliCollectionIterator    it[1],
                 const struct CliCallbackContext ctx[1],
@@ -306,12 +330,22 @@
                 struct CliCollectionIterator    *it
         );
 
+        enum status
+        cli_collection_change(
+                struct CliCollectionIterator it[1],
+                const u8                    *name
+        );
+
         void
         cli_collection_reset(
                 struct CliCollectionIterator *it
         );
 
-        
+        u8
+        cli_toggle_get(
+                const struct CliCallbackContext ctx[1],
+                const u8 name[]
+        );
 
         /* void cli_execute(); not yet */
 

@@ -18,24 +18,26 @@
 
 #include <mtest.h>
 #include <uassert.h>
+#include <uconio.h>
 #include <ssys.h>
+
 void muc_test(const struct CliCallbackContext *ctx, u8 *rc)
 {
-        struct CliCollectionIterator it;
+        struct CliCollectionIterator it[1];
         const u8 *buf;
-        enum status status[1];
 
-        cli_collection_begin(&it, ctx, (u8*) "with");
+        cli_collection_begin(it, ctx, b"with");
 
-        while((buf = cli_collection_next(&it))) {
-                write(STDOUT, (u8*)"Received value: ", 16, status);
-                write(STDOUT, buf, strlen(buf), status);
-                write(STDOUT, (u8*)"\n", 1, status);
+        while((buf = cli_collection_next(it))) {
+                println(buf);
         }
 
-        cli_collection_reset(&it);
+        cli_collection_change(it, b"as");
 
-        write(STDOUT, (u8*)"abcd\n", 5, status);
-        assert(*status==OK);
-        CLI_ACTION_SET_EXIT_CODE(OK);
+        while((buf = cli_collection_next(it))) {
+                println(buf);
+        }
+        println(b(cli_toggle_get(ctx, b"quiet") ? "YES" : "NO"));
+
+        *rc = OK;
 }

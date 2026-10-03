@@ -296,4 +296,10 @@
                 #define PAD64(x)
         #endif /* NO_PADDING */
 
+        #ifndef NO_CAST_MACRO
+                #define b (const u8*)
+        #endif/*NO_CAST_MACRO*/
+
+        #define null ((void*)0)
+
 #endif /* PORTABLE_TYPES_H */

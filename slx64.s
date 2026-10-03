@@ -25,14 +25,28 @@
 .globl  _start
 
 read:
+    movq    %rcx, %r10
     movq    $0  , %rax
     syscall
+    cmp %rax, %rdx
+    jne read_fail
+    movl $0, (%r10)
+    ret
+read_fail:
+    movl $1, (%r10)
     ret
 
 
 write:
+    movq    %rcx, %r10
     movq    $1  , %rax
     syscall
+    cmp %rax, %rdx
+    jne .write_fail
+    movl $0, (%r10)
+    ret
+.write_fail:
+    movl $1, (%r10)
     ret
 
 open:

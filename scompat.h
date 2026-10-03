@@ -14,6 +14,12 @@
 #define streq          gx_streq
 #define itoa           gx_itoa
 #define main           gx_main
+#define print          gx_print
+#define println        gx_println
+#define printerr       gx_printerr
+#define printerrln     gx_printerrln
+#define printdbg       gx_printdbg
+#define printdbgln     gx_printdbgln
 #ifdef NDEBUG
     #define assert(expr) ((void)0)
 #else
