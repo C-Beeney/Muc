@@ -30,7 +30,6 @@ clang \
     -fvisibility=hidden -fno-stack-check -fno-pic -fno-pie \
     -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions \
     -fno-stack-protector -fno-builtin -fno-common -mno-implicit-float \
-    -DNO_COMPILER_EXTENSIONS \
     -Werror --target=x86_64-pc-linux -Wl,-T,slx64.ld \
     -mno-sse -mno-sse2 -mno-mmx -msoft-float \
     -ansi -mno-red-zone -Wl,--icf=all -fmerge-all-constants -fuse-ld=lld \

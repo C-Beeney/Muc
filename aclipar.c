@@ -42,14 +42,8 @@ cli_parse_collection(
         assert(tag);
 
         /* Ensure collection tag really starts with "--" */
-        printdbg(b"Buffer: ");
-        #ifndef NDEBUG
-        println(tag);
-        #endif
         assert('-' == tag[0] && '-' == tag[1]);
 
-        printdbg(b"Comparing with tag:\n\t");
-        printdbgln(tag);
         /* Look for index of this collection in this context by name. */
         for(    index = 0;
                 index < context->counter->collection;
@@ -57,7 +51,6 @@ cli_parse_collection(
         ) {
                 if(streq(context->collection[index].name, tag + 2)
                 ) {
-                        printdbgln(b"Collection found.");
                         goto found;
                 }
         }
@@ -67,7 +60,6 @@ cli_parse_collection(
         /* If every slot taken, collection tag not found. */
         if(     CLI_COLLECTION_COUNT <= index
         ) {
-                printdbgln(b"Every slot taken, collection not found.");
                 *rc = GENERIC_ERR;
                 return;
         }
@@ -84,7 +76,6 @@ found:
 
         ++arg->index; /* Consume name of collection. */
         if (arg->index >= arg->count) {
-                printdbgln(b"Passed end of arguments.");
                 *rc = GENERIC_ERR;
                 return;
         }
@@ -181,7 +172,6 @@ cli_parse_ownable_state(
         ) {
                 cli_verify_collection_tag(registry, args[*index], rc);
                 if(*rc) {
-                        printdbgln(b"Parsing Collection...");
                         cli_parse_collection(
                                 context,
                                 arg_data,
@@ -192,14 +182,12 @@ cli_parse_ownable_state(
 
                 cli_verify_toggle_tag(registry, args[*index], rc);
                 if(*rc) {
-                        printdbgln(b"Parsing Toggle...");
                         cli_parse_toggle(context, arg_data, rc);
                         continue;
                 }
 
                 cli_verify_action_tag(registry, args[*index], rc);
                 if(*rc) {
-                        printdbgln(b"Action Found...");
                         *rc = 0;
                         break;
                 }
@@ -214,6 +202,9 @@ cli_parse_init(
         u8                rc     [1]
 ) {
         assert(context);
+        assert(context->registry);
+        assert(context->common_context);
+        assert(context->args);
         assert(rc);
 
         cli_parse_ownable_state(
@@ -222,11 +213,6 @@ cli_parse_init(
                 context->args,
                 rc
         );
-        if(!*rc) {
-                printdbgln(b"Parsed ownable state.");
-        } else {
-                printerrln(b"Failed to parse ownable state.");
-        }
 }
 
 
